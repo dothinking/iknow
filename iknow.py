@@ -1,164 +1,289 @@
-# encoding: utf8
-import requests	
-from bs4 import BeautifulSoup
-import time
-import re
-import sqlite3
+# encoding=utf8  
 
-#获取当前时间
-def getCurrentTime():
-	return time.strftime('[%Y-%m-%d %H:%M:%S]',time.localtime(time.time()))
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
+import sys
+from time import sleep
 
 class IKNOW:
-	'''读取百度知道用户回答列表，存入数据库'''
-	def __init__(self):
-		# 连接信息
-		self.base_url = "https://www.baidu.com/p/sys/data/zhidao/anslist"
-		self.headers = {
-			'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 BIDUBrowser/8.5 Safari/537.36',
-			'Referer':    'https://www.baidu.com/p/skycolorwater?from=tieba'
+
+	def __init__(self, cookies = {}):
+		'''
+		init driver
+		'''
+		print '* init driver...'
+		self.cookies = cookies
+		# login url
+		self.login_url = "https://passport.baidu.com/v2/?login"
+		self.cookie_login_url = "https://www.baidu.com"
+
+		# header
+		headers = {
+			'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+		    'Accept-Language':'zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4',
+			'Connection': 'keep-alive',
 		}
-		self.page_increment = 1 # 每页增量		
+		for key, value in headers.items():
+			DesiredCapabilities.PHANTOMJS['phantomjs.page.customHeaders.{}'.format(key)] = value
 
-		# 数据库
-		self.dbName = 'iknow.db'
-
-	def __getPage(self):
-		'''获取当前页数据'''
-
-		# 提交参数
-		param = {
-			'portrait': self.uid,
-			'pn'      : self.this_page,
-			'rec'     : 3000005,
-			't'       : "%d" % (time.time()*1000)
+		# setting
+		settings = {
+			'userAgent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
+			'loadImages': False
 		}
-		response = requests.get(self.base_url, params=param, headers=self.headers)
+		for key, value in settings.items():
+			DesiredCapabilities.PHANTOMJS['phantomjs.page.settings.{}'.format(key)] = value
 
-		res = response.text.replace(r'x22','"').replace('\\','')
-		# res = re.search(re.compile(r'"tplContent":"(.*?)',re.S), res).group()
-		res = re.search(re.compile(r'(?<="tplContent":)(.*?)(?=$)',re.S), res).group()
+		# service_args
+		service_args = [
+			# '--load-images=false'
+			# '--proxy=127.0.0.1:9999',
+			#  '--proxy-type=http',
+			#  '--ignore-ssl-errors=true'
+		]
 
-		soup = BeautifulSoup(res, "lxml")
+		# self.driver = webdriver.PhantomJS(service_args=service_args)
+		self.driver = webdriver.Chrome()
 
-		self.content = soup.find('table', class_='zhidao-anwlist-body')
+
+		# set browser size
+		# to fix bug 'Element is not currently visible and may not be manipulated'
+		self.driver.maximize_window()
+
+		# waiting time
+		self.wait = WebDriverWait(self.driver, 5)
 
 		return
 
-	def __nextPage(self):
-		'''试图获取当前页数据'''
-
-		self.this_page += self.page_increment
-
-		n = 0
-		# 由于可能间歇性获取不到数据，所以允许原地请求5次
-		while True:
-			self.__getPage()
-			n += 1
-			if self.content or n==5:
-				break
-
-		if self.content:
-			print getCurrentTime(), u" 读取第%d页数据..." % self.this_page
+	def login(self):
+		'''
+		login
+		'''
+		# if cookie is null, login by username
+		if(self.cookies):
+			self.login_by_cookie()
 		else:
-			print getCurrentTime(), u" 无法读取第%d页数据..." % self.this_page
+			self.login_by_username()
 
-		return	
+		# finally, login success
+		print '  login success'
+		print '********************************'
+		print '  welcome ' + self.username
+		# print cookies
+		# print self.driver.get_cookies()
+		sleep(3) # attention! waiting for redirection and complete login
 
-	def __getList(self,con):
-		'''获取回答列表'''
-		alists = []
+		return
 
-		items = self.content.find_all("tr", class_="anwlist-item") # 每一行记录
-		for tr in items:
-
-			# 标题及编号
-			title = tr.find('a')    # 标题元素
-			href = title['href'].split('\?')[0] # 问题url
-			aid = (re.findall("\d+", href))[0]
-
-			# 是否采纳			
-			if tr.find('span', class_='zhidao-adpt'):   # 采纳
-				adopt = 1
-			else:
-				adopt = 0
-
-			# 赞同数
-			good = tr.find('span',class_='zhidao-good-item')
-			if good:
-				num = int(good.string) # 点赞数
-			else:
-				num = 0
-
-			# 日期	
-			date = tr.find('td', class_='zhidao-item-date') # 日期单元格
-
-			li = (aid, title.string, adopt, num, date.string)
-			alists.append(li)
-
-		# 批量插入数据库
+	def login_by_username(self):
+		'''
+		login by username
+		'''
+		print '* login by username...'
+		# load login page
+		self.driver.get(self.login_url)
 		try:
-			con.executemany('INSERT INTO '+self.username+' VALUES (?,?,?,?,?)', alists)
-			con.commit()
-		except sqlite3.Error as e:
-			print "An error occurred:", e.args[0]
-			return
+			self.wait.until(lambda the_driver: the_driver.find_element_by_id('TANGRAM__PSP_3__submit').is_displayed())
+		except:
+			self.driver.quit()
+			print '  load login page failed'
+			sys.exit(0)
 
-		print getCurrentTime(), u" 插入%d条记录..." % len(alists)
+		username = raw_input('  enter username:\n')
+		password = raw_input('  enter password:\n')
 
-		return
-
-	def read(self, username, uid, maxPages=0):
-		# 初始化参数
-		self.this_page = 0 # 当前页
-		self.content = None # 当前页面数据
+		# fill form and submit
 		self.username = username
-		self.uid = uid
-		self.total = 0 # 总记录数
+		username_input = self.driver.find_element_by_id('TANGRAM__PSP_3__userName')  # email
+		username_input.clear()
+		for c in username: # avoid incomplete input
+			username_input.send_keys(c)
 
-		con = sqlite3.connect(self.dbName)
+		pswd_input = self.driver.find_element_by_id('TANGRAM__PSP_3__password')  # password
+		pswd_input.clear()
+		for c in password:
+			pswd_input.send_keys(c)
 
-		print u"统计[%s]的回答记录..." % username
-		print "----------------------------------------------------------"
+		self.driver.find_element_by_id('TANGRAM__PSP_3__submit').click()  # submit
 
-		# 新建数据表
-		con.execute('DROP TABLE IF EXISTS '+self.username)
-		con.execute('''CREATE TABLE %s
-			(AID INT PRIMARY KEY   NOT NULL,
-			TITLE          TEXT    NOT NULL,
-			ADOPTED        INT     NOT NULL,
-			GOOD           INT     NOT NULL,
-			ADATE          CHAR    NOT NULL);''' % self.username)
+		# check login status
+		# success: current url changes to be redirect url, otherwise failed
+		try:
+			self.wait.until(lambda the_driver: the_driver.current_url != self.login_url)
+		except:
+			self.driver.save_screenshot('login.png')
+			# login failed, check verify code
+			# considering mistaking input, while loop is used
+			while self.driver.current_url == self.login_url:
+				# whether verify code exist
+				try:
+					self.wait.until(lambda the_driver: the_driver.find_element_by_id('door').is_displayed())
+				except:
+					self.driver.quit()
+					print 'login failed, confirm your email or password'
+					sys.exit(0)
 
-		print getCurrentTime(), u" 创建数据表"
-
-		# 循环插入数据
-		while True:
-			# 达到要求的页数就终止
-			if maxPages and self.this_page == maxPages:
-				break
-			# 获取下一页
-			self.__nextPage()
-			if not self.content: # 没有数据了就终止 / 暂未考虑其他原因导致获取不到数据的情况
-				break
-			# 读取数据
-			self.__getList(con)			
-		
-		# 输出
-		cur = con.cursor()
-		cur.execute("SELECT COUNT(aid) FROM " + self.username)
-		num =  cur.fetchone()[0]
-		print "----------------------------------------------------------"
-		print u"总计: %d 条" % num
-
-		# 提交数据，关闭连接
-		if not num:
-			con.execute('DROP TABLE '+self.username)
-
-		con.commit()
-		con.close()
+				# enter verify code manually
+				self.driver.save_screenshot('verified_code.png') # screen shot for input manually
+				code = raw_input('Enter verified code: \n')
+				code_input = self.driver.find_element_by_id('door')
+				code_input.clear()
+				for c in code:
+					code_input.send_keys(c)
+				self.driver.find_element_by_css_selector('input.W_btn_a').click()  # submit
+				sleep(2)
 
 		return
 
-I = IKNOW()
-# I.read("skycolorwater","f31e4069236f25705e79bb68")
+
+	def login_by_cookie(self):
+		'''
+		login by cookie
+		'''
+		print '* login by cookies...'
+		# index
+		self.driver.get(self.cookie_login_url)
+		# set cookie
+		for cookie in self.cookies:
+			self.driver.add_cookie(cookie)
+
+		self.driver.refresh()
+
+		# check login status
+		try:
+			self.wait.until(lambda the_driver: the_driver.find_element_by_class_name("user-name").is_displayed())
+		except:
+			self.driver.quit()
+			print '  login failed.'
+			sys.exit(0)
+
+		self.username = self.driver.find_element_by_class_name("user-name").text
+
+		return
+
+	def comment(self, url, content):
+		'''
+		post message
+		:param contents: list
+		:return: 
+		'''
+		print '* opening comment page ...'
+		self.driver.get(url)
+		try:
+			self.wait.until(lambda the_driver: the_driver.find_element_by_css_selector('.answer-last span.comment').is_displayed())
+		except:
+			self.driver.quit()
+			print '  redirect failed'
+			sys.exit(0)
+
+		# enter message
+		print '* post comment ...'
+		# click '回复' to open textarea
+		self.driver.find_element_by_css_selector('.answer-last span.comment').click()
+		# wait and enter text
+		sleep(1)
+		txt_input = self.driver.find_element_by_css_selector('.answer-last textarea')
+		txt_input.clear()
+		for c in content:
+			txt_input.send_keys(c)
+		# wait and submit by CTRL+ENTER
+		sleep(3)
+		txt_input.send_keys(Keys.CONTROL, Keys.ENTER)
+
+		# wait and screen shot
+		sleep(1)
+		self.driver.save_screenshot('comment_success.png')
+
+		print '  post comment success'
+		return
+
+	def answer(self, url, content):
+		'''
+		post message
+		:param contents: list
+		:return: 
+		'''
+		print '* opening question page ...'
+		self.driver.get(url)
+		try:
+			self.wait.until(lambda the_driver: the_driver.find_element_by_css_selector('#answer-editor .new-editor-deliver-btn').is_displayed())
+		except:
+			self.driver.quit()
+			print '  redirect failed'
+			sys.exit(0)
+
+		# enter message
+
+		print '* post answer ...'
+		self.driver.switch_to.frame('ueditor_0')
+		txt_input = self.driver.find_element_by_tag_name('body')
+		txt_input.clear()
+		for c in content:
+			if c == '#':
+				txt_input.send_keys(Keys.ENTER)
+			else:
+				txt_input.send_keys(c)
+		# wait and submit
+		sleep(3)
+		self.driver.switch_to.default_content()
+		btn = self.driver.find_element_by_css_selector('#answer-editor .new-editor-deliver-btn')
+		btn.click()
+
+		# wait and screen shot
+		sleep(1)
+		self.driver.save_screenshot('answer_success.png')
+
+		print '  post answer success'
+		return
+
+	def down(self):
+		print '* quit ...'
+		self.driver.quit()
+
+
+cookie = [{
+		'name'  : 'BDUSS',
+		# 'value' : 'E41M0tUZHNFbUx1QldXdWxlalFTT3o5VThUUThlM1VOQkhZUXJyYkZLcjVhRVZZSVFBQUFBJCQAAAAAAAAAAAEAAABmVuJWd2VibWFzdGVydnBzAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPnbHVj52x1YO',
+		'value' : 'C1DSUZMTFo0cE1td0taejhSczI4VXRtRkxzR2N0NU9vM1hWV1JzM2IxcjJ5eXRZSVFBQUFBJCQAAAAAAAAAAAEAAAAxkTMAZGVtb24xMTkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPY-BFj2PgRYU',
+		'domain': '.baidu.com',
+		'expiry': 1751370498,
+		'path'  : '/'
+}]
+
+# cookie = {}
+url = "https://zhidao.baidu.com/question/429634604807320052.html"
+
+content = u'彼黍离离，彼稷之苗。行迈靡靡，中心摇摇。#\
+知我者谓我心忧，不知我者谓我何求。#\
+悠悠苍天！此何人哉？##\
+彼黍离离，彼稷之穗。行迈靡靡，中心如醉。#\
+知我者谓我心忧，不知我者谓我何求。#\
+悠悠苍天！此何人哉？##\
+彼黍离离，彼稷之实。行迈靡靡，中心如噎。#\
+知我者谓我心忧，不知我者谓我何求。#\
+悠悠苍天！此何人哉？'
+
+
+
+S = IKNOW(cookie)
+
+S.login()
+
+S.answer(url, content)
+
+# S.comment(comment_url, u"这回复的啥呀？")
+#
+S.down()
+
+
+
+
+
+
+
+
+
