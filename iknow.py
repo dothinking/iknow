@@ -8,15 +8,16 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 import sys
 from time import sleep
+import pickle
 
 class IKNOW:
 
-	def __init__(self, cookies = {}):
+	def __init__(self, cookie=''):
 		'''
 		init driver
 		'''
 		print '* init driver...'
-		self.cookies = cookies
+		self.cookie = cookie
 		# login url
 		self.login_url = "https://passport.baidu.com/v2/?login"
 		self.cookie_login_url = "https://www.baidu.com"
@@ -27,15 +28,15 @@ class IKNOW:
 		    'Accept-Language':'zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4',
 			'Connection': 'keep-alive',
 		}
-		for key, value in headers.items():
+		for key, value in headers.iteritems():
 			DesiredCapabilities.PHANTOMJS['phantomjs.page.customHeaders.{}'.format(key)] = value
 
 		# setting
 		settings = {
-			'userAgent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
+			'userAgent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1468.0 Safari/537.36',
 			'loadImages': False
 		}
-		for key, value in settings.items():
+		for key, value in settings.iteritems():
 			DesiredCapabilities.PHANTOMJS['phantomjs.page.settings.{}'.format(key)] = value
 
 		# service_args
@@ -46,8 +47,8 @@ class IKNOW:
 			#  '--ignore-ssl-errors=true'
 		]
 
-		# self.driver = webdriver.PhantomJS(service_args=service_args)
-		self.driver = webdriver.Chrome()
+		self.driver = webdriver.PhantomJS(service_args=service_args)
+		# self.driver = webdriver.Chrome()
 
 
 		# set browser size
@@ -56,7 +57,6 @@ class IKNOW:
 
 		# waiting time
 		self.wait = WebDriverWait(self.driver, 5)
-
 		return
 
 	def login(self):
@@ -64,7 +64,7 @@ class IKNOW:
 		login
 		'''
 		# if cookie is null, login by username
-		if(self.cookies):
+		if(self.cookie):
 			self.login_by_cookie()
 		else:
 			self.login_by_username()
@@ -145,11 +145,22 @@ class IKNOW:
 		login by cookie
 		'''
 		print '* login by cookies...'
+		# get cookie
+		cookie = {}
+		try:
+			pkl_file = open(self.cookie + '.pkl')
+			cookie = pickle.load(pkl_file)
+		except Exception as err:
+			print "  cookie file not exists: " + str(err)
+			self.driver.quit()
+			print '  login failed.'
+			sys.exit(0)
+		pkl_file.close()
+
 		# index
 		self.driver.get(self.cookie_login_url)
 		# set cookie
-		for cookie in self.cookies:
-			self.driver.add_cookie(cookie)
+		self.driver.add_cookie(cookie)
 
 		self.driver.refresh()
 
@@ -210,26 +221,46 @@ class IKNOW:
 		print '* opening question page ...'
 		self.driver.get(url)
 		try:
+			# button '提交回答'
 			self.wait.until(lambda the_driver: the_driver.find_element_by_css_selector('#answer-editor .new-editor-deliver-btn').is_displayed())
 		except:
-			self.driver.quit()
-			print '  redirect failed'
-			sys.exit(0)
+			# button '我有更好答案'
+			try:
+				self.wait.until(lambda the_driver: the_driver.find_element_by_id('answer-bar').is_displayed())
+			except:
+				self.driver.quit()
+				print '  redirect failed'
+				sys.exit(0)
+
+			self.driver.find_element_by_id('answer-bar').click()
+			sleep(1)
+
 
 		# enter message
 
 		print '* post answer ...'
-		self.driver.switch_to.frame('ueditor_0')
-		txt_input = self.driver.find_element_by_tag_name('body')
-		txt_input.clear()
-		for c in content:
-			if c == '#':
-				txt_input.send_keys(Keys.ENTER)
-			else:
-				txt_input.send_keys(c)
+		# choice I: send_keys()
+		#
+		# self.driver.switch_to.frame('ueditor_0')
+		# txt_input = self.driver.find_element_by_tag_name('body')
+		# txt_input.clear()
+		# for c in content:
+		# 		txt_input.send_keys(c)
 		# wait and submit
-		sleep(3)
-		self.driver.switch_to.default_content()
+		# sleep(3)
+		# self.driver.switch_to.default_content()
+		# btn = self.driver.find_element_by_css_selector('#answer-editor .new-editor-deliver-btn')
+		# btn.click()
+
+		# however, sending keys for a non-input element such as 'BODY' does not work for PhantomJS
+		# even though it works well for Chrome or FireFox
+		# here comes choice II: execute_script()
+
+		js = "document.getElementById('ueditor_0').contentWindow.\
+			document.getElementsByTagName('body')[0].innerHTML = ' % s'" % content
+		self.driver.execute_script(js)
+		# wait and submit
+		sleep(2)
 		btn = self.driver.find_element_by_css_selector('#answer-editor .new-editor-deliver-btn')
 		btn.click()
 
@@ -245,35 +276,18 @@ class IKNOW:
 		self.driver.quit()
 
 
-cookie = [{
-		'name'  : 'BDUSS',
-		# 'value' : 'E41M0tUZHNFbUx1QldXdWxlalFTT3o5VThUUThlM1VOQkhZUXJyYkZLcjVhRVZZSVFBQUFBJCQAAAAAAAAAAAEAAABmVuJWd2VibWFzdGVydnBzAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPnbHVj52x1YO',
-		'value' : 'C1DSUZMTFo0cE1td0taejhSczI4VXRtRkxzR2N0NU9vM1hWV1JzM2IxcjJ5eXRZSVFBQUFBJCQAAAAAAAAAAAEAAAAxkTMAZGVtb24xMTkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPY-BFj2PgRYU',
-		'domain': '.baidu.com',
-		'expiry': 1751370498,
-		'path'  : '/'
-}]
 
 # cookie = {}
-url = "https://zhidao.baidu.com/question/429634604807320052.html"
+url = "https://zhidao.baidu.com/question/1371976507250043259.html"
 
-content = u'彼黍离离，彼稷之苗。行迈靡靡，中心摇摇。#\
-知我者谓我心忧，不知我者谓我何求。#\
-悠悠苍天！此何人哉？##\
-彼黍离离，彼稷之穗。行迈靡靡，中心如醉。#\
-知我者谓我心忧，不知我者谓我何求。#\
-悠悠苍天！此何人哉？##\
-彼黍离离，彼稷之实。行迈靡靡，中心如噎。#\
-知我者谓我心忧，不知我者谓我何求。#\
-悠悠苍天！此何人哉？'
+content = u'<p>你连题目都没有给出，这可如何讲解？</p><p>高斯定理将第二类曲面积分转换为三重积分，所以如果不用高斯积分，那就按照普通的曲面积分的基本做法解题就行了。</p>'
 
 
-
-S = IKNOW(cookie)
+S = IKNOW('cookie-3')
 
 S.login()
 
-S.answer(url, content)
+# S.answer(url, content)
 
 # S.comment(comment_url, u"这回复的啥呀？")
 #
