@@ -1,9 +1,7 @@
-# encoding=utf8  
-
+# encoding=utf8
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
-
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 import sys
@@ -12,7 +10,7 @@ import pickle
 
 class IKNOW:
 
-	def __init__(self, cookie=''):
+	def __init__(self, cookie='', browser=0):
 		'''
 		init driver
 		'''
@@ -47,9 +45,11 @@ class IKNOW:
 			#  '--ignore-ssl-errors=true'
 		]
 
-		self.driver = webdriver.PhantomJS(service_args=service_args)
-		# self.driver = webdriver.Chrome()
-
+		# browser: 1 chrome, 2 firefox, others phantomjs
+		if browser == 1 :
+			self.driver = webdriver.Chrome()
+		else:
+			self.driver = webdriver.PhantomJS(service_args=service_args)
 
 		# set browser size
 		# to fix bug 'Element is not currently visible and may not be manipulated'
@@ -70,9 +70,7 @@ class IKNOW:
 			self.login_by_username()
 
 		# finally, login success
-		print '  login success'
-		print '********************************'
-		print '  welcome ' + self.username
+		print '  login success, welcome ' + self.username
 		# print cookies
 		# print self.driver.get_cookies()
 		sleep(3) # attention! waiting for redirection and complete login
@@ -138,7 +136,6 @@ class IKNOW:
 				sleep(2)
 
 		return
-
 
 	def login_by_cookie(self):
 		'''
@@ -212,19 +209,39 @@ class IKNOW:
 		print '  post comment success'
 		return
 
+	def can_answer(self, url):
+		'''
+		is this question can be answered
+		:return: boolean
+		'''
+		print '* opening question page ...'
+		self.driver.get(url)
+
+		# whether adopted
+		try:
+			self.wait.until(lambda the_driver: the_driver.find_element_by_css_selector('.wgt-best').is_displayed() or \
+											   the_driver.find_element_by_id('wgt-myanswer').is_displayed())
+		except:
+			return True
+
+		return False
+
 	def answer(self, url, content):
 		'''
 		post message
 		:param contents: list
 		:return: 
 		'''
-		print '* opening question page ...'
-		self.driver.get(url)
+
+		if not self.can_answer(url):
+			print '  this question has been solved or answered by yourself.'
+			return
+
 		try:
-			# button '提交回答'
+			# 0 answer: button with text '提交回答'
 			self.wait.until(lambda the_driver: the_driver.find_element_by_css_selector('#answer-editor .new-editor-deliver-btn').is_displayed())
 		except:
-			# button '我有更好答案'
+			# > 0 answer and I have not answered this question" button with text '我有更好答案'
 			try:
 				self.wait.until(lambda the_driver: the_driver.find_element_by_id('answer-bar').is_displayed())
 			except:
@@ -262,13 +279,16 @@ class IKNOW:
 		# wait and submit
 		sleep(2)
 		btn = self.driver.find_element_by_css_selector('#answer-editor .new-editor-deliver-btn')
-		btn.click()
+		# btn.click()
 
-		# wait and screen shot
-		sleep(1)
-		self.driver.save_screenshot('answer_success.png')
+		# wait for results
+		sleep(2)
 
-		print '  post answer success'
+		if self.driver.find_element_by_css_selector('span.answer-title').text == u'我的回答':
+			print '  post answer success'
+		else:
+			print '  post answer failed'
+			self.driver.save_screenshot('answer_failed.png')
 		return
 
 	def down(self):
@@ -276,21 +296,18 @@ class IKNOW:
 		self.driver.quit()
 
 
-
-# cookie = {}
 url = "https://zhidao.baidu.com/question/1371976507250043259.html"
 
 content = u'<p>你连题目都没有给出，这可如何讲解？</p><p>高斯定理将第二类曲面积分转换为三重积分，所以如果不用高斯积分，那就按照普通的曲面积分的基本做法解题就行了。</p>'
 
-
-S = IKNOW('cookie-3')
+S = IKNOW(browser=0, cookie='cookie-1')
 
 S.login()
 
-# S.answer(url, content)
+S.answer(url, content)
 
 # S.comment(comment_url, u"这回复的啥呀？")
-#
+
 S.down()
 
 

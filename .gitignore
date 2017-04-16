@@ -1,0 +1,10 @@
+# pickle files
+*.pkl
+
+# png files
+*.png
+
+# log files
+*.log
+
+/.idea
