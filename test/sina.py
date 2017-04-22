@@ -11,6 +11,8 @@ from time import sleep
 
 class SINA:
 
+	''' login sina weibo and post message'''
+
 	def __init__(self, cookie):
 		'''
 		init driver

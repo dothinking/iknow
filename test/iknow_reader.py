@@ -160,5 +160,8 @@ class IKNOWREADER:
 
 		return
 
-I = IKNOWREADER()
-# I.read("skycolorwater","f31e4069236f25705e79bb68")
+
+if __name__ == '__main__':
+
+	I = IKNOWREADER()
+	# I.read(username,uid)

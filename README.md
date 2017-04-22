@@ -2,7 +2,9 @@
 
 python 练习：
 
-* 基于`requests`和`BeautifulSoup`库读取静态内容：百度知道用户回答列表
+* 使用`requests`和`BeautifulSoup`库读取静态内容
 
-* 基于`selenium`和`PhantomJS`模拟登陆和提交数据：新浪微博
+* 使用`sqlite3'存储数据
+
+* 使用`selenium`和`PhantomJS`模拟登陆和提交数据
 

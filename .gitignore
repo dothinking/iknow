@@ -1,10 +1,13 @@
-# pickle files
-*.pkl
+# cookie files
+/cookies
 
 # png files
 *.png
 
 # log files
 *.log
+
+test.py
+*.pyc
 
 /.idea

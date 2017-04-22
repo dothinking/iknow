@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/iknow.py" line="308" />
+    <bookmark url="file://$PROJECT_DIR$/ianswer.py" line="295" />
+    <bookmark url="file://$PROJECT_DIR$/ifinder.py" line="59" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fe51e3bd-df59-4dad-8df5-f7e2b7964e6a" name="Default" comment="">
+    <list default="true" id="fe51e3bd-df59-4dad-8df5-f7e2b7964e6a" name="Default" comment="static spider">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/poetry/poetry.db" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ianswer.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/isolver.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/poetry/poetry_tang.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/iknow_reader.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/sina.py" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/sina.py" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/iknow.py" afterPath="$PROJECT_DIR$/iknow.py" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/iknow_reader.py" afterPath="$PROJECT_DIR$/ifinder.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -21,27 +32,67 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="ianswer.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ianswer.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="371">
+              <caret line="153" column="53" lean-forward="true" selection-start-line="153" selection-start-column="53" selection-end-line="153" selection-end-column="53" />
+              <folding>
+                <element signature="e#16#46#0" expanded="true" />
+                <element signature="e#4888#5295#0" expanded="false" />
+                <element signature="e#5333#6274#0" expanded="false" />
+                <element signature="e#6311#8260#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ifinder.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ifinder.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1318">
+              <caret line="82" column="17" lean-forward="false" selection-start-line="82" selection-start-column="17" selection-end-line="82" selection-end-column="17" />
+              <folding>
+                <element signature="e#17#33#0" expanded="true" />
+                <element signature="e#140#724#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="isolver.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/isolver.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="333">
+              <caret line="18" column="55" lean-forward="true" selection-start-line="18" selection-start-column="55" selection-end-line="18" selection-end-column="55" />
+              <folding>
+                <element signature="e#17#31#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="iknow.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/iknow.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="418">
-              <caret line="174" column="0" lean-forward="true" selection-start-line="174" selection-start-column="0" selection-end-line="174" selection-end-column="0" />
+            <state relative-caret-position="421">
+              <caret line="66" column="19" lean-forward="true" selection-start-line="66" selection-start-column="19" selection-end-line="66" selection-end-column="19" />
               <folding>
-                <element signature="e#16#46#0" expanded="true" />
-                <element signature="e#339#1707#0" expanded="false" />
-                <element signature="e#1729#2079#0" expanded="false" />
-                <element signature="e#2113#4019#0" expanded="false" />
-                <element signature="e#3380#4009#0" expanded="false" />
-                <element signature="e#4051#4801#0" expanded="false" />
-                <element signature="e#4839#5732#0" expanded="false" />
-                <element signature="e#5764#6144#0" expanded="false" />
-                <element signature="e#6181#8073#0" expanded="false" />
+                <element signature="e#18#37#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
@@ -54,10 +105,19 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
+        <option value="$PROJECT_DIR$/iknow_static.py" />
+        <option value="$PROJECT_DIR$/test.html" />
+        <option value="$PROJECT_DIR$/poetry_tang.py" />
+        <option value="$PROJECT_DIR$/tool.py" />
+        <option value="$PROJECT_DIR$/ifinder.py" />
         <option value="$PROJECT_DIR$/sina.py" />
+        <option value="$PROJECT_DIR$/check_cookie.py" />
         <option value="$PROJECT_DIR$/README.md" />
-        <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/test/iknow_reader.py" />
         <option value="$PROJECT_DIR$/iknow.py" />
+        <option value="$PROJECT_DIR$/ianswer.py" />
+        <option value="$PROJECT_DIR$/isolver.py" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -65,6 +125,22 @@
     <option name="x" value="-9" />
     <option name="width" value="1924" />
     <option name="height" value="1050" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>Buildout</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -81,6 +157,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -95,15 +173,17 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="preferences.editor" />
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\program\iknow\cookies" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\program\iknow" />
     </key>
@@ -120,8 +200,8 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.iknow">
-    <configuration default="false" name="sina" type="PythonConfigurationType" factoryName="Python" temporary="true">
+  <component name="RunManager" selected="Python.iknow (1)">
+    <configuration default="false" name="ianswer" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -133,13 +213,49 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="iknow" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sina.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ianswer.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <method />
     </configuration>
-    <configuration default="false" name="iknow" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration default="false" name="ifinder" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="iknow" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ifinder.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="poetry_tang" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="iknow" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/poetry_tang.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="iknow (1)" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -152,6 +268,24 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="iknow" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/iknow.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="check_cookie" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="iknow" />
+      <option name="SCRIPT_NAME" value="D:\program\iknow\cookies\check_cookie.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -225,14 +359,20 @@
       <option name="_new_targetType" value="&quot;PATH&quot;" />
       <method />
     </configuration>
-    <list size="2">
-      <item index="0" class="java.lang.String" itemvalue="Python.sina" />
-      <item index="1" class="java.lang.String" itemvalue="Python.iknow" />
+    <list size="5">
+      <item index="0" class="java.lang.String" itemvalue="Python.ianswer" />
+      <item index="1" class="java.lang.String" itemvalue="Python.ifinder" />
+      <item index="2" class="java.lang.String" itemvalue="Python.poetry_tang" />
+      <item index="3" class="java.lang.String" itemvalue="Python.iknow (1)" />
+      <item index="4" class="java.lang.String" itemvalue="Python.check_cookie" />
     </list>
     <recent_temporary>
-      <list size="2">
-        <item index="0" class="java.lang.String" itemvalue="Python.iknow" />
-        <item index="1" class="java.lang.String" itemvalue="Python.sina" />
+      <list size="5">
+        <item index="0" class="java.lang.String" itemvalue="Python.iknow (1)" />
+        <item index="1" class="java.lang.String" itemvalue="Python.ianswer" />
+        <item index="2" class="java.lang.String" itemvalue="Python.check_cookie" />
+        <item index="3" class="java.lang.String" itemvalue="Python.ifinder" />
+        <item index="4" class="java.lang.String" itemvalue="Python.poetry_tang" />
       </list>
     </recent_temporary>
   </component>
@@ -271,7 +411,14 @@
       <option name="project" value="LOCAL" />
       <updated>1492331257072</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="static spider">
+      <created>1492352389682</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1492352389682</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TodoView">
@@ -287,7 +434,7 @@
     <frame x="-9" y="0" width="1924" height="1050" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12714592" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13143776" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3277897" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -317,42 +464,117 @@
     <option name="LAST_COMMIT_MESSAGE" value="static spider" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager />
+    <breakpoint-manager>
+      <option name="time" value="2" />
+    </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/iknow.py">
+    <entry file="file://$PROJECT_DIR$/ianswer.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#16#46#0" expanded="true" />
-            <element signature="e#339#1707#0" expanded="false" />
-            <element signature="e#1729#2079#0" expanded="false" />
-            <element signature="e#2113#4019#0" expanded="false" />
-            <element signature="e#3380#4009#0" expanded="false" />
-            <element signature="e#4051#4801#0" expanded="false" />
-            <element signature="e#4839#5732#0" expanded="false" />
-            <element signature="e#5764#6144#0" expanded="false" />
-            <element signature="e#6181#8073#0" expanded="false" />
+            <element signature="e#4888#5295#0" expanded="false" />
+            <element signature="e#5333#6274#0" expanded="false" />
+            <element signature="e#6311#8260#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ifinder.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="10" column="14" lean-forward="true" selection-start-line="10" selection-start-column="14" selection-end-line="10" selection-end-column="14" />
+          <folding>
+            <element signature="e#17#33#0" expanded="true" />
+            <element signature="e#140#724#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/isolver.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="110">
+          <caret line="6" column="0" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+          <folding>
+            <element signature="e#17#31#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/iknow.py">
       <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1386">
+          <caret line="64" column="54" lean-forward="true" selection-start-line="64" selection-start-column="54" selection-end-line="64" selection-end-column="54" />
+          <folding>
+            <element signature="e#18#37#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ianswer.py">
+      <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#16#46#0" expanded="true" />
-            <element signature="e#339#1707#0" expanded="false" />
-            <element signature="e#1729#2079#0" expanded="false" />
-            <element signature="e#2113#4019#0" expanded="false" />
-            <element signature="e#3380#4009#0" expanded="false" />
-            <element signature="e#4051#4801#0" expanded="false" />
-            <element signature="e#4839#5732#0" expanded="false" />
-            <element signature="e#5764#6144#0" expanded="false" />
-            <element signature="e#6181#8073#0" expanded="false" />
+            <element signature="e#4888#5295#0" expanded="false" />
+            <element signature="e#5333#6274#0" expanded="false" />
+            <element signature="e#6311#8260#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ianswer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#16#46#0" expanded="true" />
+            <element signature="e#4888#5295#0" expanded="false" />
+            <element signature="e#5333#6274#0" expanded="false" />
+            <element signature="e#6311#8260#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ianswer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#16#46#0" expanded="true" />
+            <element signature="e#4888#5295#0" expanded="false" />
+            <element signature="e#5333#6274#0" expanded="false" />
+            <element signature="e#6311#8260#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ianswer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#16#46#0" expanded="true" />
+            <element signature="e#4888#5295#0" expanded="false" />
+            <element signature="e#5333#6274#0" expanded="false" />
+            <element signature="e#6311#8260#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ianswer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#16#46#0" expanded="true" />
+            <element signature="e#4888#5295#0" expanded="false" />
+            <element signature="e#5333#6274#0" expanded="false" />
+            <element signature="e#6311#8260#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -380,37 +602,15 @@
     <entry file="file://$PROJECT_DIR$/post_success_1.png" />
     <entry file="file://$PROJECT_DIR$/post_success_2.png" />
     <entry file="file://$PROJECT_DIR$/post_success_3.png" />
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="176">
-          <caret line="8" column="0" lean-forward="true" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/iknow_reader.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="528">
-          <caret line="163" column="35" lean-forward="true" selection-start-line="163" selection-start-column="35" selection-end-line="163" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/login.png" />
     <entry file="file://$PROJECT_DIR$/post_success.png" />
     <entry file="file://$PROJECT_DIR$/comment_success.png" />
     <entry file="file://$PROJECT_DIR$/answer_success0.png" />
     <entry file="file://$PROJECT_DIR$/answer_success1.png" />
-    <entry file="file://$PROJECT_DIR$/sina.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-858">
-          <caret line="10" column="0" lean-forward="false" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../User/Lib/site-packages/selenium/webdriver/remote/command.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="330">
           <caret line="54" column="31" lean-forward="true" selection-start-line="54" selection-start-column="4" selection-end-line="54" selection-end-column="31" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -418,7 +618,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="441">
           <caret line="492" column="32" lean-forward="true" selection-start-line="492" selection-start-column="32" selection-end-line="492" selection-end-column="32" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -426,11 +625,76 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-481">
           <caret line="465" column="8" lean-forward="false" selection-start-line="465" selection-start-column="8" selection-end-line="465" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cookies.pkl" />
+    <entry file="file://$PROJECT_DIR$/answer_success.png" />
+    <entry file="file://$PROJECT_DIR$/test.html" />
+    <entry file="file://$PROJECT_DIR$/tool.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/poetry_tang.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="443">
+          <caret line="85" column="13" lean-forward="true" selection-start-line="84" selection-start-column="8" selection-end-line="85" selection-end-column="31" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/cookies.pkl">
+    <entry file="file://$PROJECT_DIR$/iknow_static.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1584">
+          <caret line="304" column="0" lean-forward="true" selection-start-line="304" selection-start-column="0" selection-end-line="304" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cookie-2.pkl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="15" column="182" lean-forward="true" selection-start-line="15" selection-start-column="2" selection-end-line="15" selection-end-column="194" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cookie-1.pkl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="374">
+          <caret line="17" column="3" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="19" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/reader.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="154">
+          <caret line="11" column="18" lean-forward="false" selection-start-line="11" selection-start-column="18" selection-end-line="11" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sina.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3256">
+          <caret line="18" column="11" lean-forward="true" selection-start-line="18" selection-start-column="11" selection-end-line="18" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cookies/demon119.pkl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="15" column="5" lean-forward="false" selection-start-line="15" selection-start-column="2" selection-end-line="15" selection-end-column="194" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/爵丶士丶.pkl">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -438,33 +702,104 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
+    <entry file="file://$PROJECT_DIR$/cookies/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="9" column="6" lean-forward="true" selection-start-line="9" selection-start-column="6" selection-end-line="9" selection-end-column="6" />
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/answer_success.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
+    <entry file="file://$PROJECT_DIR$/poetry/poetry_tang.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="198">
+          <caret line="12" column="23" lean-forward="true" selection-start-line="12" selection-start-column="23" selection-end-line="12" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="132">
+          <caret line="6" column="17" lean-forward="true" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/tool.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/iknow_reader.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1672">
+          <caret line="166" column="26" lean-forward="true" selection-start-line="166" selection-start-column="26" selection-end-line="166" selection-end-column="26" />
+          <folding>
+            <element signature="e#17#33#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cookies/check_cookie.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1655">
+          <caret line="113" column="13" lean-forward="false" selection-start-line="113" selection-start-column="13" selection-end-line="113" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ianswer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="371">
+          <caret line="153" column="53" lean-forward="true" selection-start-line="153" selection-start-column="53" selection-end-line="153" selection-end-column="53" />
+          <folding>
+            <element signature="e#16#46#0" expanded="true" />
+            <element signature="e#4888#5295#0" expanded="false" />
+            <element signature="e#5333#6274#0" expanded="false" />
+            <element signature="e#6311#8260#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ifinder.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1318">
+          <caret line="82" column="17" lean-forward="false" selection-start-line="82" selection-start-column="17" selection-end-line="82" selection-end-column="17" />
+          <folding>
+            <element signature="e#17#33#0" expanded="true" />
+            <element signature="e#140#724#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/isolver.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="333">
+          <caret line="18" column="55" lean-forward="true" selection-start-line="18" selection-start-column="55" selection-end-line="18" selection-end-column="55" />
+          <folding>
+            <element signature="e#17#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="154">
+          <caret line="7" column="5" lean-forward="true" selection-start-line="7" selection-start-column="5" selection-end-line="7" selection-end-column="5" />
+          <folding />
+        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/iknow.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="418">
-          <caret line="174" column="0" lean-forward="true" selection-start-line="174" selection-start-column="0" selection-end-line="174" selection-end-column="0" />
+        <state relative-caret-position="421">
+          <caret line="66" column="19" lean-forward="true" selection-start-line="66" selection-start-column="19" selection-end-line="66" selection-end-column="19" />
           <folding>
-            <element signature="e#16#46#0" expanded="true" />
-            <element signature="e#339#1707#0" expanded="false" />
-            <element signature="e#1729#2079#0" expanded="false" />
-            <element signature="e#2113#4019#0" expanded="false" />
-            <element signature="e#3380#4009#0" expanded="false" />
-            <element signature="e#4051#4801#0" expanded="false" />
-            <element signature="e#4839#5732#0" expanded="false" />
-            <element signature="e#5764#6144#0" expanded="false" />
-            <element signature="e#6181#8073#0" expanded="false" />
+            <element signature="e#18#37#0" expanded="true" />
           </folding>
         </state>
       </provider>
