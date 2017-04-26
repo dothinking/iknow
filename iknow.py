@@ -4,7 +4,7 @@ import random, time
 import ifinder, isolver, ianswer
 
 class IKNOW:
-    def __init__(self, num=10, keyword=u'百度', browser=0, cookie=''):
+    def __init__(self, num=10, browser=0, method='site', cookie=''):
         '''
         init parameters
         :param keyword: 
@@ -14,7 +14,6 @@ class IKNOW:
         self.title = '[IKNOW ] '
         print self.title, 'RUN...'
 
-        self.keyword = keyword
         self.target = num    # questions to be answered
         self.success = 0     # questions answered
 
@@ -24,12 +23,12 @@ class IKNOW:
 
         # init components
         self.finder = ifinder.IFinder()
-        self.solver = isolver.ISolver()
+        self.solver = isolver.ISolver(method=method)
         self.answer = ianswer.IAnswer(browser=browser, cookie=cookie)
 
         return
 
-    def run(self):
+    def run(self, tag=u'百度', site=2):
         '''
             post answer automatically
         '''
@@ -38,19 +37,24 @@ class IKNOW:
 
             # question
             try:
-                url = self.finder.get_question(self.keyword)
+                this_question = self.finder.get_question(tag)
             except Exception as msg:
                 print '[ERROR ] ', msg
-                self.down()
+                self.failed += 1
+                continue
 
             # solver
-            content = self.solver.solver_1()
-            html_content = '<p>' + content.replace(u'。', u'。' + '<p>').replace(u'？', u'？' + '<p>')
+            try:
+                content = self.solver.solver(keyword=this_question[1], site=site)
+            except Exception as msg:
+                print '[ERROR ] ', msg
+                self.failed += 1
+                continue
 
             # post answer
             res = False
             try:
-                res = self.answer.answer(url, html_content)
+                res = self.answer.answer(this_question[0], content)
             except Exception as msg:
                 print '[ERROR ] ', msg
 
@@ -59,7 +63,7 @@ class IKNOW:
                 self.success += 1
                 self.failed = 0    # clear failed times
                 print self.title, 'post answer successfully'
-                time.sleep(random.randint(60, 120)) # delay for 1-2 minutes
+                time.sleep(random.randint(100, 250)) # delay for 1-2 minutes
             else:
                 self.failed += 1
                 print self.title, 'post answer failed'
@@ -70,6 +74,7 @@ class IKNOW:
 
     def down(self):
         # summary
+        print
         self.answer.down()
         print
         print self.title, "target number: %d, succeed: %d" % (self.target, self.success)
@@ -77,5 +82,5 @@ class IKNOW:
 
 if __name__ == '__main__':
 
-    I = IKNOW(num=6, keyword=u'诗词', browser=0, cookie=u'爵丶士丶')
-    I.run()
+    I = IKNOW(num=5, browser=0, cookie=u'buptzym')
+    I.run(tag=u'高等数学', site=2)

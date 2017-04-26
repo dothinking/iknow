@@ -221,7 +221,7 @@ class IAnswer:
 		print  self.title, 'post comment success'
 		return
 
-	def answer(self, url, content):
+	def answer(self, url, content, anonymous=False):
 		'''
 		post message
 		:param contents: list
@@ -269,7 +269,8 @@ class IAnswer:
 		self.driver.execute_script(js)
 		# wait and submit
 		time.sleep(self.short)
-		self.driver.find_element_by_css_selector('.unname input').click() # anonymous
+		if anonymous:
+			self.driver.find_element_by_css_selector('.unname input').click() # anonymous
 		btn = self.driver.find_element_by_css_selector('#answer-editor .new-editor-deliver-btn')
 		btn.click()
 
@@ -292,10 +293,10 @@ if __name__ == '__main__':
 	content1 = '<p>paragraph 1</p><p>paragraph 2</p>'
 	content2 = 'something comment'
 
-	S = IAnswer(browser=0, cookie='demon119')
-	S.answer(url, content1)
-	S.comment(url, content2)
-	S.down()
+	S = IAnswer(browser=1, cookie=u'爵丶士丶')
+	# S.answer(url, content1)
+	# S.comment(url, content2)
+	# S.down()
 
 
 
