@@ -1,11 +1,11 @@
 # cookie files
 /cookies
+/_post
+/_images
 
 # png files
 *.png
 *.jpg
-
-*.md
 
 # log files
 *.log
