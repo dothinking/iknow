@@ -293,7 +293,7 @@ if __name__ == '__main__':
 	content1 = '<p>paragraph 1</p><p>paragraph 2</p>'
 	content2 = 'something comment'
 
-	S = IAnswer(browser=1, cookie=u'爵丶士丶')
+	S = IAnswer(browser=1, cookie=u'buptzym')
 	# S.answer(url, content1)
 	# S.comment(url, content2)
 	# S.down()
