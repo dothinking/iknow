@@ -3,6 +3,9 @@
 
 # png files
 *.png
+*.jpg
+
+*.md
 
 # log files
 *.log
