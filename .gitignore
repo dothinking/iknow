@@ -1,11 +1,14 @@
-# cookie files
-/cookies
-/_posts
-/_images
 
-# png files
-*.png
+# cookies
+*.pkl
+
+# posts
+*.md
+!README.md
+
+# images
 *.jpg
+*.png
 
 # log files
 *.log
