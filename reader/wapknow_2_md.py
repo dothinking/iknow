@@ -8,8 +8,6 @@ sys.setdefaultencoding( "utf-8" )
 
 class IKNOWTOMARKDOWN:
 	'''读取百度知道指定用户回答内容，存储为Markdown文件'''
-
-
 	def __init__(self):
 		# 连接信息
 		self.url_list = "https://zhidao.baidu.com/mucenter/ajax/getAnswer"
@@ -35,14 +33,15 @@ class IKNOWTOMARKDOWN:
 
 		# 日志
 		self.log = open('log.log', 'a')
-		self.log.write(u"开启记录")
+		self.__log("开启记录")
 
 		return
 
 	def fetch_list(self):
 		'''获取当前页问题列表'''
 
-		self.__log(u" 读取第%d页数据..." % self.this_page)
+		self.__log()
+		self.__log("读取第%d页数据..." % self.this_page)
 
 		# 提交参数
 		param = {
@@ -69,23 +68,19 @@ class IKNOWTOMARKDOWN:
 			self.qlist.append(li)
 
 		# 检测解析数据是否成功
-		if len(self.qlist):
-			self.this_page += 1
-		else:
-			msg = "解析第%d页失败" % self.this_page
-			raise Exception(msg)
+		assert len(self.qlist), "解析第%d页失败" % self.this_page
 
+		self.this_page += 1
 		return
 
-
-	def __log(self, msg='\n'):
+	def __log(self, msg=''):
 		'''日志'''
-		if msg != '\n':
+		if msg:
 			now = time.strftime('[%Y-%m-%d %H:%M:%S]',time.localtime(time.time()))
-			msg = "%s %s\n" % (now, msg)
+			msg = "%s %s" % (now, msg)
 
 		print msg
-		self.log.write(msg)
+		self.log.write(msg+'\n')
 
 		return
 
@@ -116,22 +111,17 @@ class IKNOWTOMARKDOWN:
 	def fetch_content(self, item):
 		'''获取问题内容'''
 
-		self.__log(u" 当前问题编号：%s" % item[0])
+		self.__log("当前问题编号：%s" % item[0])
 
 		# 搜集数据
 		url = self.url_ques + item[0]
 		response = requests.get(url, headers=self.headers)
 		response.encoding = 'utf-8'
-
 		soup = BeautifulSoup(response.text, "html.parser")
 
+		obj = soup.find(class_='w-question-box')
 		# 检测能否访问此问题
-		try:
-			obj = soup.find(class_='w-question-box')
-		except Exception:
-			msg = "问题已失效" % self.this_page
-			raise Exception(msg)
-
+		assert obj, "问题已失效"
 
 		# 1 提问文本
 		q_content = []
@@ -254,9 +244,6 @@ class IKNOWTOMARKDOWN:
 		self.username  = username
 		max_page = startPage+numPage
 
-		print u"统计[%s]的回答记录..." % username
-		print "----------------------------------------------------------"
-
 		fail = 0
 
 		# 循环插入数据
@@ -273,7 +260,7 @@ class IKNOWTOMARKDOWN:
 					self.fetch_content(item)
 					time.sleep(1)
 				except Exception as msg:
-					self.__log(u"ERROR: %s" % msg)
+					self.__log("ERROR: %s" % msg)
 					self.failed_qlist.append(item)
 
 			else:
@@ -290,7 +277,7 @@ class IKNOWTOMARKDOWN:
 				try:
 					self.fetch_list()
 				except Exception as msg:
-					self.__log(u"ERROR: %s" % msg)
+					self.__log("ERROR: %s" % msg)
 
 				# 如果请求后还没有数据，那就算失败一次
 				if not len(self.qlist):
@@ -299,7 +286,7 @@ class IKNOWTOMARKDOWN:
 		# 查缺补漏
 		if len(self.failed_qlist):
 			self.__log()
-			self.__log(u" 读取完毕，开始查缺补漏：")
+			self.__log("读取完毕，开始查缺补漏：")
 
 		fail = 0
 		while len(self.failed_qlist):
@@ -311,7 +298,7 @@ class IKNOWTOMARKDOWN:
 			try:
 				self.fetch_content(item)
 			except Exception as msg:
-				self.__log(u"ERROR: %s" % msg)
+				self.__log("ERROR: %s" % msg)
 				self.failed_qlist.append(item)
 				fail += 1
 				continue
@@ -323,9 +310,10 @@ class IKNOWTOMARKDOWN:
 		'''清理数据'''
 		# 小结
 		self.__log()
-		res = u" 当前第%d页，共搜集记录数：%s\n" % (self.this_page - 1, self.total)
+		res = "当前第%d页，共搜集记录数：%s" % (self.this_page - 1, self.total)
 		self.__log(res)
-		self.__log(u"记录完毕")
+		self.__log("记录完毕")
+		self.__log()
 		self.log.close()
 		return
 
@@ -336,4 +324,4 @@ if __name__ == '__main__':
 
 	I = IKNOWTOMARKDOWN()
 
-	I.run(username,3)
+	I.run(username,4,2)
