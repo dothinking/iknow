@@ -1,15 +1,10 @@
 # encoding: utf8
-import requests, urllib
+import requests, urllib, HTMLParser
 from bs4 import BeautifulSoup
 import time, sys, re
 
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
-
-#获取当前时间
-def getCurrentTime():
-	return time.strftime('[%Y-%m-%d %H:%M:%S]',time.localtime(time.time()))
-
 
 class IKNOWTOMARKDOWN:
 	'''读取百度知道指定用户回答内容，存储为Markdown文件'''
@@ -38,16 +33,16 @@ class IKNOWTOMARKDOWN:
 		self.failed_qlist = [] # 失败记录
 		self.total = 0         # 成功获取到的记录数
 
-		# 错误日志
-		self.errorlog = open('log.log', 'a')
-		self.errorlog.write('%s\n' % getCurrentTime())
+		# 日志
+		self.log = open('log.log', 'a')
+		self.log.write(u"开启记录")
 
 		return
 
 	def fetch_list(self):
 		'''获取当前页问题列表'''
 
-		print getCurrentTime(), u" 读取第%d页数据..." % self.this_page
+		self.__log(u" 读取第%d页数据..." % self.this_page)
 
 		# 提交参数
 		param = {
@@ -83,11 +78,14 @@ class IKNOWTOMARKDOWN:
 		return
 
 
-	def __log(self, msg):
-		'''错误日志'''
+	def __log(self, msg='\n'):
+		'''日志'''
+		if msg != '\n':
+			now = time.strftime('[%Y-%m-%d %H:%M:%S]',time.localtime(time.time()))
+			msg = "%s %s\n" % (now, msg)
 
 		print msg
-		self.errorlog.write("%s\n" % msg)
+		self.log.write(msg)
 
 		return
 
@@ -115,12 +113,10 @@ class IKNOWTOMARKDOWN:
 		else:
 			return False
 
-
-
 	def fetch_content(self, item):
 		'''获取问题内容'''
 
-		print getCurrentTime(), u" 当前问题编号：%s" % item[0]
+		self.__log(u" 当前问题编号：%s" % item[0])
 
 		# 搜集数据
 		url = self.url_ques + item[0]
@@ -196,6 +192,7 @@ class IKNOWTOMARKDOWN:
 
 		# 文本
 		a_content = response['data']['content'].replace("<br />", "\n\n")
+		a_content = HTMLParser.HTMLParser().unescape(a_content) # HTML解码：'&gt;' => '>'
 
 		# 图片
 		img_urls = []
@@ -276,7 +273,7 @@ class IKNOWTOMARKDOWN:
 					self.fetch_content(item)
 					time.sleep(1)
 				except Exception as msg:
-					self.__log(u"[ERROR in %s]: %s" %(item[0], msg))
+					self.__log(u"ERROR: %s" % msg)
 					self.failed_qlist.append(item)
 
 			else:
@@ -293,7 +290,7 @@ class IKNOWTOMARKDOWN:
 				try:
 					self.fetch_list()
 				except Exception as msg:
-					self.__log(u"[ERROR]: %s" % msg)
+					self.__log(u"ERROR: %s" % msg)
 
 				# 如果请求后还没有数据，那就算失败一次
 				if not len(self.qlist):
@@ -301,7 +298,8 @@ class IKNOWTOMARKDOWN:
 		
 		# 查缺补漏
 		if len(self.failed_qlist):
-			print '\n', getCurrentTime(), u" 读取完毕，开始查缺补漏："
+			self.__log()
+			self.__log(u" 读取完毕，开始查缺补漏：")
 
 		fail = 0
 		while len(self.failed_qlist):
@@ -313,16 +311,22 @@ class IKNOWTOMARKDOWN:
 			try:
 				self.fetch_content(item)
 			except Exception as msg:
-				self.__log(u"[ERROR in %s]: %s" % (item[0], msg))
+				self.__log(u"ERROR: %s" % msg)
 				self.failed_qlist.append(item)
 				fail += 1
 				continue
+		# 结束
+		self.down()
+		return
 
+	def down(self):
+		'''清理数据'''
 		# 小结
-		print
-		res = getCurrentTime() + u" 当前第%d页，共搜集记录数：%s\n" % (self.this_page-1, self.total)
+		self.__log()
+		res = u" 当前第%d页，共搜集记录数：%s\n" % (self.this_page - 1, self.total)
 		self.__log(res)
-		self.errorlog.close()
+		self.__log(u"记录完毕")
+		self.log.close()
 		return
 
 
@@ -332,4 +336,4 @@ if __name__ == '__main__':
 
 	I = IKNOWTOMARKDOWN()
 
-	I.run(username)
+	I.run(username,3)
