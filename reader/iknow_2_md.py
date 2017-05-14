@@ -21,9 +21,29 @@ class IKNOWTOMARKDOWN:
 		# 连接信息
 		self.base_url = "https://www.baidu.com/p/sys/data/zhidao/anslist"
 		self.headers = {
-			'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 BIDUBrowser/8.5 Safari/537.36',
-			'Referer':    'https://www.baidu.com/p/skycolorwater?from=tieba'
+			'Accept':'*/*',
+			'Accept-Encoding':'gzip, deflate, sdch, br',
+			'Accept-Language':'zh-CN,zh;q=0.8',
+			'Connection':'keep-alive',
+			'Host':'www.baidu.com',
+			'Referer':'https://www.baidu.com/p/learneroner?from=tieba',
+			'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.98 Safari/537.36 Vivaldi/1.6.689.40'
 		}
+		self.headers_1 = {
+			'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+			'Accept-Encoding': 'gzip, deflate, sdch, br',
+			'Accept-Language': 'zh-CN,zh;q=0.8',
+			'Cache-Control': 'max-age=0',
+			'Connection': 'keep-alive',
+			'Host': 'zhidao.baidu.com',
+			'Referer': 'https://www.baidu.com/p/learneroner?from=tieba',
+			'Upgrade-Insecure-Requests': 1,
+			'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.98 Safari/537.36 Vivaldi/1.6.689.40'
+		}
+		self.coookies = {
+			'BAIDUID': 'C453C8073B9FA7AAD07C3C75780040E1:FG = 1'
+		}
+
 		self.page_increment = 1 # 每页增量
 
 		self.qlist = []  # 当前页需要处理记录列表
@@ -143,7 +163,7 @@ class IKNOWTOMARKDOWN:
 
 		# 搜集数据
 		url = 'https://zhidao.baidu.com/question/%s.html' % item[0]
-		response = requests.get(url, headers=self.headers)
+		response = requests.get(url, cookies=self.coookies, headers=self.headers_1)
 		response.encoding = 'gbk'
 		soup = BeautifulSoup(response.text, "lxml")
 
@@ -222,7 +242,7 @@ class IKNOWTOMARKDOWN:
 			layout: post
 			author: %s
 			title : %s
-			tags  : 
+			tags  : 不定积分
 			---
 			''' % (self.username, item[1])
 			f.write("%s\n\n" % title.replace("\t","").strip())
@@ -260,10 +280,10 @@ class IKNOWTOMARKDOWN:
 		while True:	
 
 			# 达到失败次数就停止
-			if fail > maxFail:
+			if fail == maxFail:
 				break
 
-			time.sleep(1)
+			time.sleep(3)
 
 			# 列表有数据则处理，没数据则获取之
 			if len(self.qlist):
@@ -274,7 +294,6 @@ class IKNOWTOMARKDOWN:
 				except Exception as msg:
 					self.__log(u"%s: %s" %(item[0], msg))
 					self.failed_qlist.append(item)
-					continue
 
 			else:
 
@@ -286,9 +305,7 @@ class IKNOWTOMARKDOWN:
 				try:
 					self.__getList()
 				except Exception as msg:
-					self.__log(u"%s" %(msg))
-					self.failed_qlist.append(item)
-					continue
+					self.__log(u"%s" % msg)
 
 				# 如果请求后还没有数据，那就算失败一次
 				if not len(self.qlist):
@@ -328,4 +345,4 @@ if __name__ == '__main__':
 	uid = '79fe4069236f25705e79e406'
 
 	I = IKNOWTOMARKDOWN()
-	I.run(username,uid,1,2)
+	I.run(username,uid,4,1)
