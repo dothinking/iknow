@@ -24,8 +24,8 @@ class IKNOWTOMARKDOWN:
 			'Host': 'zhidao.baidu.com'
 		}
 
-		self.max_page = 100      # 初始化最大页面数
 		self.page_increment = 20 # 每页记录数
+		self.more_page = True    # 是否还有下一页数据
 
 		self.qlist = []        # 当前页需要处理记录列表
 		self.failed_qlist = [] # 失败记录
@@ -59,9 +59,7 @@ class IKNOWTOMARKDOWN:
 
 		# 记录总数及当前页数据
 		data =  response['data']['list']['entry']
-		total = response['data']['list']['total']
-
-		self.max_page = int(total/self.page_increment) + 1
+		self.more_page = response['data']['list']['hasMore']
 
 		for item in data:
 			li = (item['qid'], item['title'], item['reply_create_time'])
@@ -157,15 +155,27 @@ class IKNOWTOMARKDOWN:
 		# 2 回答内容：可以直接提取内容，这里提取回答的rid，然后直接调用api获取json数据
 
 		# 先找到回答者，然后追溯到回答内容
-		# 注意高质量回答和普通回答渲染形式的不同
-		a_tag = soup.find("span", class_="name", text=re.compile("%s" %self.username))
-		if a_tag:
-			tag = a_tag.find_parent("div", class_="replier-info")
+		# 注意有三种页面形式：
+		# (a) 问题已处理且为普通回答：<span class="name>username</span>
+		# (b) 问题已处理且为高质回答：<a class="ask-name-mavin">username</a>
+		# (c) 问题未处理
+
+		name_tag = soup.find("span", class_="name", text=re.compile("%s" % self.username))
+		if name_tag: # a
+			tag = name_tag.find_parent("div", class_="replier-info")
 		else:
-			a_tag = soup.find("a", class_="ask-name-mavin", text="%s" %self.username)
-			tag = a_tag.find_parent("div", class_="quality-info")
+			name_tag = soup.find("a", class_="ask-name-mavin", text="%s" % self.username)
+			if name_tag: # b
+				tag = name_tag.find_parent("div", class_="quality-info")
+			else: # c
+				pa = re.compile(r'(?<=<!--<div class="w-replies mm-content-box" id="other-replies-list" >)(.*?)(?=</script>--></code>)',re.S)
+				res = re.search(pa, response.text).group()
+				soup_1 = BeautifulSoup(res, "html.parser")
+				name_tag = soup_1.find("span", class_="name", text=re.compile("%s" % self.username))
+				tag = name_tag.find_parent("div", class_="replier-info")
 
 		# 获取回答id
+		assert tag, '未找到回答记录'
 		obj = tag.find_next_sibling("div").find('div', attrs={'data-rid': True})
 		rid = obj['data-rid']
 
@@ -266,12 +276,10 @@ class IKNOWTOMARKDOWN:
 			else:
 
 				# 达到要求的页数就终止
-				if numPage and self.this_page == max_page:
-					break
+				if self.this_page == max_page: break
 
 				# 超出总页数也得停止
-				if self.this_page > self.max_page:
-					break
+				if not self.more_page: break
 
 				# 请求数据
 				try:
@@ -324,4 +332,4 @@ if __name__ == '__main__':
 
 	I = IKNOWTOMARKDOWN()
 
-	I.run(username,4,2)
+	I.run(username,6,2)
