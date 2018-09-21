@@ -1,10 +1,7 @@
 # encoding: utf8
-import requests, urllib, HTMLParser
+import requests, urllib
 from bs4 import BeautifulSoup
 import time, sys, re
-
-reload(sys)
-sys.setdefaultencoding( "utf-8" )
 
 class IKNOWTOMARKDOWN:
 	'''读取百度知道指定用户回答内容，存储为Markdown文件'''
@@ -21,7 +18,8 @@ class IKNOWTOMARKDOWN:
 			'Accept-Language': 'zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4',
 			'Connection': 'keep-alive',
 			'Accept-Encoding': 'gzip, deflate, sdch, br',
-			'Host': 'zhidao.baidu.com'
+			'Host': 'zhidao.baidu.com',
+			'cookie': 'ipInfoCity=undefined; bdshare_firstime=1456746771467; Hm_lvt_984e2fa9c4e197b52de4d44030b4da47=1463671026,1464176144; Hm_lvt_94c79c2423b66c2b7d519b8ab793a35a=1466474586,1467074357,1467211052,1467349936; TmTask87130=2; Hm_lvt_16bc67e4f6394c05d03992ea0a0e9123=1469366215,1469366248; SHRINK=1; TmTask87572=5; ifCommonClose=2016-12-09; Hm_lvt_3c289bcdc6afd0a014a7b070b81a5f79=1481803281,1482193622,1483065429; IK_CID_78=24; IK_CID_85=141; IK_CID_77=58; IK_CID_95=39; IK_CID_82=49; IK_CID_79=16; IK_CID_1031=195; BIDUPSID=39685300B3CC990D791B6074CC22D0A4; IK_CID_81=184; BAIDUID=FF39ABE9E84DCDBD67F1ADB88E2CECEE:FG=1; PSTM=1492414150; IK_CID_1101=125; IK_CID_84=65; IK_CID_80=170; IK_CID_1=84; Hm_lvt_6859ce5aaf00fb00387e6434e4fcc925=1494565060,1494565116,1494568078,1494860098; Hm_lpvt_6859ce5aaf00fb00387e6434e4fcc925=1494860098; pgv_pvi=4408077312; pgv_si=s6482154496; FP_UID=4d1c67dbee0779d0b9591d48564afe36; BDUSS=NuZUU0R3ZnUEF6cjVDZzBYbGR1M0lQTzgzY0Y2a1lEYWpuWFRpbkVYc0I4MEZaSVFBQUFBJCQAAAAAAAAAAAEAAAB5~uQGbGVhcm5lcm9uZXIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFmGlkBZhpZUX; IK_CID_83=15804; CPLN=200; CPOFF=25; IK_FF39ABE9E84DCDBD67F1ADB88E2CECEE=59; IK_CID_74=4799; PSINO=1; H_PS_PSSID=1464_21124_20929; BDORZ=B490B5EBF6F3CD402E515D22BCDA1598'
 		}
 
 		self.page_increment = 20 # 每页记录数
@@ -32,7 +30,7 @@ class IKNOWTOMARKDOWN:
 		self.total = 0         # 成功获取到的记录数
 
 		# 日志
-		self.log = open('log.log', 'a')
+		self.log = open('log.log', 'a', encoding='utf-8')
 		self.__log("开启记录")
 
 		return
@@ -77,9 +75,9 @@ class IKNOWTOMARKDOWN:
 			now = time.strftime('[%Y-%m-%d %H:%M:%S]',time.localtime(time.time()))
 			msg = "%s %s" % (now, msg)
 
-		print msg
+		# print(msg)
 		self.log.write(msg+'\n')
-
+		self.log.flush()
 		return
 
 	def __save_file(self, filename, url):
@@ -117,34 +115,20 @@ class IKNOWTOMARKDOWN:
 		response.encoding = 'utf-8'
 		soup = BeautifulSoup(response.text, "html.parser")
 
-		obj = soup.find(class_='w-question-box')
+		obj = soup.find(class_='wgt-question')
 		# 检测能否访问此问题
 		assert obj, "问题已失效"
 
 		# 1 提问文本
 		q_content = []
-		if obj.find(class_='cont'):
-			q_content = ["%s\n\n" % string for string in obj.find(class_='cont').stripped_strings]
+		if obj.find(class_='wgt-question-desc-inner'):			
+			q_content = ["{0}\n\n".format(string) for string in obj.find(class_='wgt-question-desc-inner').stripped_strings]
 
 		# 提问图片
 		q_imgs = []
-		obj_imgs = obj.find_all(class_='q-img')
-		i = 0
-		for obj_img in obj_imgs:
-
-			i += 1
-
-			# url 解码
-			url = obj_img['data-bigurl'].split('src=')[1]
-			img_url = urllib.unquote(url)
-
-			# 下载
-			if i==1:
-				img_name = 'q-%s.jpg' % item[0]
-			else:
-				img_name = 'q-%s-%d.jpg' % (item[0], i)
-
-			if self.__save_file('_images/' + img_name, img_url):
+		for i, obj_img in enumerate(obj.find_all(class_='wgt-question-image-item'), start=1):
+			img_name = 'q-%s.jpg' % item[0] if i==1 else 'q-%s-%d.jpg' % (item[0], i)
+			if self.__save_file('_images/' + img_name, obj_img['data-src']):
 				q_imgs.append(img_name)
 			else:
 				msg = "下载第%d幅提问图片失败" % i
@@ -153,31 +137,19 @@ class IKNOWTOMARKDOWN:
 		q_img_content = ['<div align=\'center\'><img src="{{ \'%s\' | prepend: site.uploads | prepend: site.baseurl }}"></div>\n\n' % img for img in q_imgs]
 
 		# 2 回答内容：可以直接提取内容，这里提取回答的rid，然后直接调用api获取json数据
-
 		# 先找到回答者，然后追溯到回答内容
-		# 注意有三种页面形式：
-		# (a) 问题已处理且为普通回答：<span class="name>username</span>
-		# (b) 问题已处理且为高质回答：<a class="ask-name-mavin">username</a>
-		# (c) 问题未处理
-
-		name_tag = soup.find("span", class_="name", text=re.compile("%s" % self.username))
-		if name_tag: # a
-			tag = name_tag.find_parent("div", class_="replier-info")
-		else:
-			name_tag = soup.find("a", class_="ask-name-mavin", text="%s" % self.username)
-			if name_tag: # b
-				tag = name_tag.find_parent("div", class_="quality-info")
-			else: # c
-				pa = re.compile(r'(?<=<!--<div class="w-replies mm-content-box" id="other-replies-list" >)(.*?)(?=</script>--></code>)',re.S)
-				res = re.search(pa, response.text).group()
-				soup_1 = BeautifulSoup(res, "html.parser")
-				name_tag = soup_1.find("span", class_="name", text=re.compile("%s" % self.username))
-				tag = name_tag.find_parent("div", class_="replier-info")
+		author = soup.find("a", text=re.compile("%s" % self.username))
+		assert author, "暂未发现回答者"
 
 		# 获取回答id
-		assert tag, '未找到回答记录'
-		obj = tag.find_next_sibling("div").find('div', attrs={'data-rid': True})
-		rid = obj['data-rid']
+		reply_item = author.find_parent("div", class_="question-author-container").find_next_sibling("div")		
+		prefix = 'reply-item-'
+		for class_name in reply_item.attrs['class']:
+			if prefix in class_name:
+				rid = class_name.replace(prefix, '')
+				break
+		else:
+			raise Exception('未找到回答记录')
 
 		# 从api接口获取json数据
 		param = {
@@ -185,32 +157,20 @@ class IKNOWTOMARKDOWN:
 			'rid': rid
 		}
 		try:
-			response = requests.get(self.url_anws, params=param).json()
+			response = requests.get(self.url_anws, params=param, headers=self.headers).json()
 		except Exception:
 			msg = "读取回答内容失败"
 			raise Exception(msg)
 
 		# 文本
 		a_content = response['data']['content'].replace("<br />", "\n\n")
-		a_content = HTMLParser.HTMLParser().unescape(a_content) # HTML解码：'&gt;' => '>'
+		# a_content = HTMLParser.HTMLParser().unescape(a_content) # HTML解码：'&gt;' => '>'
 
 		# 图片
-		img_urls = []
-		if response['data']['imgUrl']:
-			img_urls = [url[0] for url in response['data']['imgUrl']]
-
-		i = 0
+		img_urls = [url[0] for url in response['data']['imgUrl']] if response['data']['imgUrl'] else []
 		a_imgs = []
-		for url in img_urls:
-
-			i += 1
-
-			# 下载
-			if i==1:
-				img_name = 'a-%s.jpg' % item[0]
-			else:
-				img_name = 'a-%s-%d.jpg' % (item[0], i)
-
+		for i, url in enumerate(img_urls, start=1):
+			img_name = 'a-%s.jpg' % item[0] if i==1 else 'a-%s-%d.jpg' % (item[0], i)
 			if self.__save_file('_images/' + img_name, url):
 				a_imgs.append(img_name)
 			else:
@@ -222,17 +182,17 @@ class IKNOWTOMARKDOWN:
 
 		# 3 保存数据
 		filename = '_posts/%s-%s.md' %(item[2], item[0])
-		with open(filename, 'w') as f:
+		with open(filename, 'w', encoding='utf-8') as f:
 
 			# title
 			title = '''---
 			layout: post
-			author: %s
-			title : %s
+			author: {0}
+			title : {1}
 			tags  : 不定积分
-			---
-			''' % (self.username, item[1])
-			f.write("%s\n\n" % title.replace("\t","").strip())
+			---\n\n
+			'''.format(self.username, item[1]).replace("\t","")
+			f.write(title)
 
 			# question
 			f.writelines(q_content)
@@ -332,4 +292,4 @@ if __name__ == '__main__':
 
 	I = IKNOWTOMARKDOWN()
 
-	I.run(username,6,2)
+	I.run(username,96,5)
