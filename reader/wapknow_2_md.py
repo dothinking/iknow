@@ -2,6 +2,8 @@
 import requests, urllib
 from bs4 import BeautifulSoup
 import time, sys, re
+import html
+
 
 class IKNOWTOMARKDOWN:
 	'''读取百度知道指定用户回答内容，存储为Markdown文件'''
@@ -164,7 +166,7 @@ class IKNOWTOMARKDOWN:
 
 		# 文本
 		a_content = response['data']['content'].replace("<br />", "\n\n")
-		# a_content = HTMLParser.HTMLParser().unescape(a_content) # HTML解码：'&gt;' => '>'
+		a_content = html.unescape(a_content) # HTML解码：'&gt;' => '>'
 
 		# 图片
 		img_urls = [url[0] for url in response['data']['imgUrl']] if response['data']['imgUrl'] else []
@@ -292,4 +294,4 @@ if __name__ == '__main__':
 
 	I = IKNOWTOMARKDOWN()
 
-	I.run(username,96,5)
+	I.run(username,101,5)
