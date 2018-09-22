@@ -1,9 +1,11 @@
 # encoding: utf8
-import requests, urllib
-from bs4 import BeautifulSoup
-import time, sys, re
-import html
+# python 3.6
 
+import requests
+from bs4 import BeautifulSoup
+import time
+import re
+import html
 
 class IKNOWTOMARKDOWN:
 	'''读取百度知道指定用户回答内容，存储为Markdown文件'''
@@ -20,8 +22,7 @@ class IKNOWTOMARKDOWN:
 			'Accept-Language': 'zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4',
 			'Connection': 'keep-alive',
 			'Accept-Encoding': 'gzip, deflate, sdch, br',
-			'Host': 'zhidao.baidu.com',
-			'cookie': 'ipInfoCity=undefined; bdshare_firstime=1456746771467; Hm_lvt_984e2fa9c4e197b52de4d44030b4da47=1463671026,1464176144; Hm_lvt_94c79c2423b66c2b7d519b8ab793a35a=1466474586,1467074357,1467211052,1467349936; TmTask87130=2; Hm_lvt_16bc67e4f6394c05d03992ea0a0e9123=1469366215,1469366248; SHRINK=1; TmTask87572=5; ifCommonClose=2016-12-09; Hm_lvt_3c289bcdc6afd0a014a7b070b81a5f79=1481803281,1482193622,1483065429; IK_CID_78=24; IK_CID_85=141; IK_CID_77=58; IK_CID_95=39; IK_CID_82=49; IK_CID_79=16; IK_CID_1031=195; BIDUPSID=39685300B3CC990D791B6074CC22D0A4; IK_CID_81=184; BAIDUID=FF39ABE9E84DCDBD67F1ADB88E2CECEE:FG=1; PSTM=1492414150; IK_CID_1101=125; IK_CID_84=65; IK_CID_80=170; IK_CID_1=84; Hm_lvt_6859ce5aaf00fb00387e6434e4fcc925=1494565060,1494565116,1494568078,1494860098; Hm_lpvt_6859ce5aaf00fb00387e6434e4fcc925=1494860098; pgv_pvi=4408077312; pgv_si=s6482154496; FP_UID=4d1c67dbee0779d0b9591d48564afe36; BDUSS=NuZUU0R3ZnUEF6cjVDZzBYbGR1M0lQTzgzY0Y2a1lEYWpuWFRpbkVYc0I4MEZaSVFBQUFBJCQAAAAAAAAAAAEAAAB5~uQGbGVhcm5lcm9uZXIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFmGlkBZhpZUX; IK_CID_83=15804; CPLN=200; CPOFF=25; IK_FF39ABE9E84DCDBD67F1ADB88E2CECEE=59; IK_CID_74=4799; PSINO=1; H_PS_PSSID=1464_21124_20929; BDORZ=B490B5EBF6F3CD402E515D22BCDA1598'
+			'Host': 'zhidao.baidu.com'
 		}
 
 		self.page_increment = 20 # 每页记录数
@@ -35,6 +36,79 @@ class IKNOWTOMARKDOWN:
 		self.log = open('log.log', 'a', encoding='utf-8')
 		self.__log("开启记录")
 
+		# 本地存储图片的全路径
+		self.img_url_pattern = '<div align=\'center\'><img src="{{ \'{0}\' | prepend: site.uploads | prepend: site.baseurl }}"></div>\n\n'
+
+		return
+
+	def run(self, username, startPage=1, numPage=1, maxFail=5):
+		'''主进程'''
+		# 初始化参数
+		self.this_page = startPage # 当前页
+		self.username  = username
+		max_page = startPage+numPage
+
+		fail = 0
+
+		# 循环插入数据
+		while True:	
+
+			# 达到失败次数就停止
+			if fail == maxFail:
+				break
+
+			# 列表有数据则处理，没数据则获取之
+			if len(self.qlist):
+				item = self.qlist.pop()
+				try:
+					self.fetch_content(item)
+					time.sleep(1)
+				except Exception as msg:
+					self.__log("ERROR: {0}".format(msg))
+					self.failed_qlist.append(item)
+
+			else:
+
+				# 达到要求的页数就终止
+				if self.this_page == max_page: break
+
+				# 超出总页数也得停止
+				if not self.more_page: break
+
+				# 请求数据
+				try:
+					self.fetch_list()
+				except Exception as msg:
+					self.__log("ERROR: {0}".format(msg))
+
+				# 如果请求后还没有数据，那就算失败一次
+				if not len(self.qlist):
+					fail += 1
+		
+		# 查缺补漏
+		if len(self.failed_qlist):
+			self.__log()
+			self.__log("读取完毕，开始查缺补漏：")
+
+		fail = 0
+		while len(self.failed_qlist):
+			if fail == maxFail: break
+			item = self.failed_qlist.pop()
+			try:
+				self.fetch_content(item)
+			except Exception as msg:
+				self.__log("ERROR: {0}".format(msg))
+				self.failed_qlist.append(item)
+				fail += 1
+				continue
+		
+		# 结束
+		self.__log()
+		res = "当前第{0}页，共搜集记录数：{1}".format(self.this_page - 1, self.total)
+		self.__log(res)
+		self.__log("记录完毕")
+		self.__log()
+		self.log.close()
 		return
 
 	def fetch_list(self):
@@ -69,6 +143,51 @@ class IKNOWTOMARKDOWN:
 		assert len(self.qlist), "解析第%d页失败" % self.this_page
 
 		self.this_page += 1
+		return
+
+	def fetch_content(self, item):
+		'''获取问题内容'''
+
+		self.__log("当前问题编号：%s" % item[0])
+
+		# 搜集数据
+		url = self.url_ques + item[0]
+		response = requests.get(url, headers=self.headers)
+		response.encoding = 'utf-8'
+		soup = BeautifulSoup(response.text, "html.parser")
+
+		# 问题内容
+		q_content, q_img_content = self.__fetch_question(soup, item[0])
+
+		# 回答内容
+		a_content, a_img_content = self.__fetch_answer(soup, item[0])		
+
+		# 3 保存数据
+		filename = '_posts/{0}-{1}.md'.format(item[2], item[0])
+		with open(filename, 'w', encoding='utf-8') as f:
+			# title
+			title = '''---
+			layout: post
+			author: {0}
+			title : {1}
+			tags  : 不定积分
+			---\n\n
+			'''.format(self.username, item[1]).replace("\t","")
+			f.write(title)
+
+			# question
+			f.writelines(q_content)
+			f.writelines(q_img_content)
+
+			# seperate
+			f.writelines(['\n\n', '---', '\n\n'])
+
+			# answer
+			f.write(a_content)
+			f.writelines(a_img_content)
+
+		self.total += 1
+
 		return
 
 	def __log(self, msg=''):
@@ -106,41 +225,40 @@ class IKNOWTOMARKDOWN:
 		else:
 			return False
 
-	def fetch_content(self, item):
-		'''获取问题内容'''
+	def __fetch_question(self, dom, qid):
+		'''获取提问内容'''
 
-		self.__log("当前问题编号：%s" % item[0])
-
-		# 搜集数据
-		url = self.url_ques + item[0]
-		response = requests.get(url, headers=self.headers)
-		response.encoding = 'utf-8'
-		soup = BeautifulSoup(response.text, "html.parser")
-
-		obj = soup.find(class_='wgt-question')
 		# 检测能否访问此问题
+		obj = dom.find(class_='wgt-question')		
 		assert obj, "问题已失效"
 
-		# 1 提问文本
-		q_content = []
-		if obj.find(class_='wgt-question-desc-inner'):			
-			q_content = ["{0}\n\n".format(string) for string in obj.find(class_='wgt-question-desc-inner').stripped_strings]
+		# 提问文本
+		obj_content = obj.find(class_='wgt-question-desc-inner')
+		q_content = ["{0}\n\n".format(line) for line in obj_content.stripped_strings] if obj_content else []
 
 		# 提问图片
 		q_imgs = []
 		for i, obj_img in enumerate(obj.find_all(class_='wgt-question-image-item'), start=1):
-			img_name = 'q-%s.jpg' % item[0] if i==1 else 'q-%s-%d.jpg' % (item[0], i)
+			img_name = 'q-{0}.jpg'.format(qid) if i==1 else 'q-{0}-{1}.jpg'.format(qid, i)
 			if self.__save_file('_images/' + img_name, obj_img['data-src']):
 				q_imgs.append(img_name)
 			else:
-				msg = "下载第%d幅提问图片失败" % i
-				raise Exception(msg)
+				raise Exception("下载第{0}幅提问图片失败".format(i))		
+		q_img_content = [self.img_url_pattern.format(img) for img in q_imgs]
 
-		q_img_content = ['<div align=\'center\'><img src="{{ \'%s\' | prepend: site.uploads | prepend: site.baseurl }}"></div>\n\n' % img for img in q_imgs]
+		return q_content, q_img_content
 
-		# 2 回答内容：可以直接提取内容，这里提取回答的rid，然后直接调用api获取json数据
-		# 先找到回答者，然后追溯到回答内容
-		author = soup.find("a", text=re.compile("%s" % self.username))
+	def __fetch_answer(self, dom, qid):
+		'''获取回答内容：提取回答的rid后用api获取json数据'''
+
+		# 定位回答者
+		author = dom.find("a", text=re.compile("%s" % self.username))
+		if not author: # 回答被折叠
+			script_reply = dom.find('script', id='reply-wgt-tmpl')
+			if script_reply:
+				hidden_dom = BeautifulSoup(script_reply.text, "html.parser")
+				author = hidden_dom.find("a", text=re.compile("%s" % self.username))
+
 		assert author, "暂未发现回答者"
 
 		# 获取回答id
@@ -155,14 +273,15 @@ class IKNOWTOMARKDOWN:
 
 		# 从api接口获取json数据
 		param = {
-			'qid': item[0],
+			'qid': qid,
 			'rid': rid
 		}
 		try:
 			response = requests.get(self.url_anws, params=param, headers=self.headers).json()
 		except Exception:
-			msg = "读取回答内容失败"
-			raise Exception(msg)
+			raise Exception("获取回答内容失败")
+
+		assert response.get('errno', 1)==0, '获取回答内容失败'
 
 		# 文本
 		a_content = response['data']['content'].replace("<br />", "\n\n")
@@ -172,121 +291,15 @@ class IKNOWTOMARKDOWN:
 		img_urls = [url[0] for url in response['data']['imgUrl']] if response['data']['imgUrl'] else []
 		a_imgs = []
 		for i, url in enumerate(img_urls, start=1):
-			img_name = 'a-%s.jpg' % item[0] if i==1 else 'a-%s-%d.jpg' % (item[0], i)
+			img_name = 'a-{0}.jpg'.format(qid) if i==1 else 'a-{0}-{1}.jpg'.format(qid, i)
 			if self.__save_file('_images/' + img_name, url):
 				a_imgs.append(img_name)
 			else:
-				msg = "下载第%d幅回答图片失败" % i
-				raise Exception(msg)
+				raise Exception("下载第{0}幅回答图片失败".format(i))
 
-		a_img_content = ['<div align=\'center\'><img src="{{ \'%s\' | prepend: site.uploads | prepend: site.baseurl }}"></div>\n\n' % img for img in a_imgs]
+		a_img_content = [self.img_url_pattern.format(img) for img in a_imgs]
 
-
-		# 3 保存数据
-		filename = '_posts/%s-%s.md' %(item[2], item[0])
-		with open(filename, 'w', encoding='utf-8') as f:
-
-			# title
-			title = '''---
-			layout: post
-			author: {0}
-			title : {1}
-			tags  : 不定积分
-			---\n\n
-			'''.format(self.username, item[1]).replace("\t","")
-			f.write(title)
-
-			# question
-			f.writelines(q_content)
-			f.writelines(q_img_content + ['\n\n', '---', '\n\n'])
-
-			# answer
-			f.write(a_content)
-			f.writelines(a_img_content)
-
-		self.total += 1
-
-		return
-
-
-	def run(self, username, startPage=1, numPage=1, maxFail=5):
-		'''主进程'''
-		# 初始化参数
-		self.this_page = startPage # 当前页
-		self.username  = username
-		max_page = startPage+numPage
-
-		fail = 0
-
-		# 循环插入数据
-		while True:	
-
-			# 达到失败次数就停止
-			if fail == maxFail:
-				break
-
-			# 列表有数据则处理，没数据则获取之
-			if len(self.qlist):
-				item = self.qlist.pop()
-				try:
-					self.fetch_content(item)
-					time.sleep(1)
-				except Exception as msg:
-					self.__log("ERROR: %s" % msg)
-					self.failed_qlist.append(item)
-
-			else:
-
-				# 达到要求的页数就终止
-				if self.this_page == max_page: break
-
-				# 超出总页数也得停止
-				if not self.more_page: break
-
-				# 请求数据
-				try:
-					self.fetch_list()
-				except Exception as msg:
-					self.__log("ERROR: %s" % msg)
-
-				# 如果请求后还没有数据，那就算失败一次
-				if not len(self.qlist):
-					fail += 1
-		
-		# 查缺补漏
-		if len(self.failed_qlist):
-			self.__log()
-			self.__log("读取完毕，开始查缺补漏：")
-
-		fail = 0
-		while len(self.failed_qlist):
-
-			if fail == maxFail: break
-
-			item = self.failed_qlist.pop()
-
-			try:
-				self.fetch_content(item)
-			except Exception as msg:
-				self.__log("ERROR: %s" % msg)
-				self.failed_qlist.append(item)
-				fail += 1
-				continue
-		# 结束
-		self.down()
-		return
-
-	def down(self):
-		'''清理数据'''
-		# 小结
-		self.__log()
-		res = "当前第%d页，共搜集记录数：%s" % (self.this_page - 1, self.total)
-		self.__log(res)
-		self.__log("记录完毕")
-		self.__log()
-		self.log.close()
-		return
-
+		return a_content, a_img_content		
 
 if __name__ == '__main__':
 
@@ -294,4 +307,4 @@ if __name__ == '__main__':
 
 	I = IKNOWTOMARKDOWN()
 
-	I.run(username,101,5)
+	I.run(username,131,5)
