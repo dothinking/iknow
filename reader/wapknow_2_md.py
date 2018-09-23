@@ -14,6 +14,7 @@ class IKNOWTOMARKDOWN:
 		self.url_list = "https://zhidao.baidu.com/mucenter/ajax/getAnswer"
 		self.url_ques = 'https://zhidao.baidu.com/question/'
 		self.url_anws = 'http://zhidao.baidu.com/msearch/ajax/getsearchqb'
+		self.url_query = 'https://zhidao.baidu.com/msearch/ajax/getsearchlist' # {word: xx, pn: xx}
 
 		# mobile
 		self.headers = {
@@ -22,7 +23,8 @@ class IKNOWTOMARKDOWN:
 			'Accept-Language': 'zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4',
 			'Connection': 'keep-alive',
 			'Accept-Encoding': 'gzip, deflate, sdch, br',
-			'Host': 'zhidao.baidu.com'
+			'Host': 'zhidao.baidu.com',
+			'Referer': 'https://zhidao.baidu.com/'
 		}
 
 		self.page_increment = 20 # 每页记录数
@@ -128,15 +130,14 @@ class IKNOWTOMARKDOWN:
 		try:
 			response = requests.get(self.url_list, params=param).json()
 		except Exception:
-			msg = "读取第%d页失败" % self.this_page
-			raise Exception(msg)
+			raise Exception("读取第{0}页失败".format(self.this_page))
 
 		# 记录总数及当前页数据
 		data =  response['data']['list']['entry']
 		self.more_page = response['data']['list']['hasMore']
 
 		for item in data:
-			li = (item['qid'], item['title'], item['reply_create_time'])
+			li = (item['qid'], html.unescape(item['title']), item['reply_create_time'])
 			self.qlist.append(li)
 
 		# 检测解析数据是否成功
@@ -307,4 +308,7 @@ if __name__ == '__main__':
 
 	I = IKNOWTOMARKDOWN()
 
-	I.run(username,131,5)
+	I.run(username,136,5)
+
+
+	
