@@ -39,7 +39,7 @@ class IKNOWTOMARKDOWN:
 		self.__log("开启记录")
 
 		# 本地存储图片的全路径
-		self.img_url_pattern = '<div align=\'center\'><img src="{{ \'{0}\' | prepend: site.uploads | prepend: site.baseurl }}"></div>\n\n'
+		self.img_url_pattern = '<div align=\'center\'><img src="{{{{ \'{0}\' | prepend: site.uploads | prepend: site.baseurl }}}}"></div>\n\n' # 注意{{被转义为{
 
 		return
 
@@ -308,7 +308,7 @@ if __name__ == '__main__':
 
 	I = IKNOWTOMARKDOWN()
 
-	I.run(username,141,5)
+	I.run(username,146,5)
 
 
 	
