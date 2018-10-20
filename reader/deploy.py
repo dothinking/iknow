@@ -4,8 +4,8 @@ import shutil
 # source and desination folder
 source_posts = os.path.join(os.getcwd(), '_posts')
 source_images = os.path.join(os.getcwd(), '_images')
-dest_posts = 'D:\\website\\iknow\\_posts'
-dest_images = 'D:\\website\\iknow\\public\\uploads'
+dest_posts = 'D:\\WorkSpace\\Gitee\\iknow\\_posts'
+dest_images = 'D:\\WorkSpace\\Gitee\\iknow\\public\\uploads'
 
 def move_posts():
 	'''move posts'''
