@@ -15,6 +15,7 @@ class IKNOWTOMARKDOWN:
 		self.url_ques = 'https://zhidao.baidu.com/question/'
 		self.url_anws = 'http://zhidao.baidu.com/msearch/ajax/getsearchqb'
 		self.url_query = 'https://zhidao.baidu.com/msearch/ajax/getsearchlist' # {word: xx, pn: xx}
+		self.url_detail_qa = 'http://zhidao.baidu.com/question/api/mini?qid=xx&rid=xx&tag=timeliness' # detail answer with reply history
 
 		# mobile
 		self.headers = {
@@ -171,7 +172,7 @@ class IKNOWTOMARKDOWN:
 			layout: post
 			author: {0}
 			title : {1}
-			tags  : 不定积分
+			tags  : UNTAGGED
 			---\n\n
 			'''.format(self.username, item[1]).replace("\t","")
 			f.write(title)
@@ -308,7 +309,7 @@ if __name__ == '__main__':
 
 	I = IKNOWTOMARKDOWN()
 
-	I.run(username,161,5)
+	I.run(username,241,10)
 
 
 	
