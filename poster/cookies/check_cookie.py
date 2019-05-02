@@ -16,7 +16,7 @@ class IAnswer:
 		:param browser: 1 chrome, others phantomjs
 		'''
 		self.title = '[ANSWER] '
-		print self.title, 'init driver...\n'
+		print(self.title, 'init driver...\n')
 
 		# login url
 		self.cookie_login_url = "https://www.baidu.com"
@@ -27,7 +27,7 @@ class IAnswer:
 		    'Accept-Language':'zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4',
 			'Connection': 'keep-alive',
 		}
-		for key, value in headers.iteritems():
+		for key, value in headers.items():
 			DesiredCapabilities.PHANTOMJS['phantomjs.page.customHeaders.{}'.format(key)] = value
 
 		# setting
@@ -35,7 +35,7 @@ class IAnswer:
 			'userAgent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1468.0 Safari/537.36',
 			'loadImages': False
 		}
-		for key, value in settings.iteritems():
+		for key, value in settings.items():
 			DesiredCapabilities.PHANTOMJS['phantomjs.page.settings.{}'.format(key)] = value
 
 		# service_args
@@ -62,7 +62,7 @@ class IAnswer:
 		'''
 		login by cookie
 		'''
-		print self.title, 'check cookie...'
+		print(self.title, 'check cookie...')
 		self.driver.get(self.cookie_login_url)
 		self.driver.add_cookie(cookie)
 		self.driver.refresh()
@@ -78,7 +78,7 @@ class IAnswer:
 		return True
 
 	def down(self):
-		print self.title, 'quit ...'
+		print(self.title, 'quit ...')
 		self.driver.quit()
 
 if __name__ == '__main__':
@@ -106,12 +106,12 @@ if __name__ == '__main__':
 			output = open('%s.pkl' % S.username, 'w')
 			pickle.dump(cookie, output)
 			output.close()
-			print S.title, 'login success, welcome %s' % S.username
+			print(S.title, 'login success, welcome %s' % S.username)
 		else:
-			print S.title, 'invalid cookie'
+			print(S.title, 'invalid cookie')
 
 		i += 1
-		print
+		print()
 	S.down()
 
 

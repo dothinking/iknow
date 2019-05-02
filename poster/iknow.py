@@ -82,5 +82,5 @@ class IKNOW:
 
 if __name__ == '__main__':
 
-    I = IKNOW(num=5, browser=0, cookie=u'buptzym')
+    I = IKNOW(num=5, browser=1)
     I.run(tag=u'高等数学', site=2)

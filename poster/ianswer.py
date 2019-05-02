@@ -28,13 +28,15 @@ class IAnswer:
 			'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 		    'Accept-Language':'zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4',
 			'Connection': 'keep-alive',
+			'Host': 'www.baidu.com',
+			'Referer': 'https://zhidao.baidu.com'
 		}
 		for key, value in headers.iteritems():
 			DesiredCapabilities.PHANTOMJS['phantomjs.page.customHeaders.{}'.format(key)] = value
 
 		# setting
 		settings = {
-			'userAgent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1468.0 Safari/537.36',
+			'userAgent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.98 Safari/537.36 Vivaldi/1.6.689.40',
 			'loadImages': False
 		}
 		for key, value in settings.iteritems():
@@ -293,7 +295,7 @@ if __name__ == '__main__':
 	content1 = '<p>paragraph 1</p><p>paragraph 2</p>'
 	content2 = 'something comment'
 
-	S = IAnswer(browser=1, cookie=u'buptzym')
+	S = IAnswer(browser=1, cookie=u'悲哀的abc')
 	# S.answer(url, content1)
 	# S.comment(url, content2)
 	# S.down()
