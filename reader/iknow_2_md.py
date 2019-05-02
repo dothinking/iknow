@@ -1,6 +1,7 @@
 # encoding: utf8
 # python 3.6
 
+import os
 import requests
 from bs4 import BeautifulSoup
 import time
@@ -28,126 +29,119 @@ class IKNOWTOMARKDOWN:
 			'Referer': 'https://zhidao.baidu.com/'
 		}
 
-		self.page_increment = 20 # 每页记录数
-		self.more_page = True    # 是否还有下一页数据
-
-		self.qlist = []        # 当前页需要处理记录列表
-		self.failed_qlist = [] # 失败记录
-		self.total = 0         # 成功获取到的记录数
-
 		# 日志
-		self.log = open('log.log', 'a', encoding='utf-8')
+		self.log = open('log.log', 'w', encoding='utf-8')
 		self.__log("开启记录")
 
 		# 本地存储图片的全路径
 		self.img_url_pattern = '<div align=\'center\'><img src="{{{{ \'{0}\' | prepend: site.uploads | prepend: site.baseurl }}}}"></div>\n\n' # 注意{{被转义为{
 
-		return
 
-	def run(self, username, startPage=1, numPage=1, maxFail=5):
-		'''主进程'''
-		# 初始化参数
-		self.this_page = startPage # 当前页
-		self.username  = username
-		max_page = startPage+numPage
+	def run(self, username, startPage=1, numPage=-1, increment=20, path=None):
+		'''
+		   numPage: 读取页面数，默认-1表示所有页面
+		   increment: 每页问题数
+		'''
 
-		fail = 0
+		page_index = startPage # 当前页
+		item_count = 0 # 成功读取记录数
+		has_more_page = True
 
-		# 循环插入数据
+		qlist = [] # 待读取的问题列表 [(qid, title, create_time), ...]
+		failed_qlist = [] # 读取失败的问题编号 [qid,...]
+
+		# 创建图片下载及问题保存目录
+		if not path:
+			path = os.getcwd()
+		post_path = os.path.join(path, username, 'posts')
+		img_path = os.path.join(path, username, 'images')
+		if not os.path.exists(post_path):
+			os.makedirs(post_path)
+		if not os.path.exists(img_path):
+			os.makedirs(img_path)
+
+		# 读取数据
 		while True:	
-
-			# 达到失败次数就停止
-			if fail == maxFail:
-				break
-
 			# 列表有数据则处理，没数据则获取之
-			if len(self.qlist):
-				item = self.qlist.pop()
+			if qlist:
+				item = qlist.pop()
 				try:
-					self.fetch_content(item)
-					time.sleep(1)
+					self.fetch_content(item, username, post_path, img_path)
+					item_count += 1
+					time.sleep(0.5)
 				except Exception as msg:
 					self.__log("ERROR: {0}".format(msg))
-					self.failed_qlist.append(item)
+					failed_qlist.append(item)
 
 			else:
 
 				# 达到要求的页数就终止
-				if self.this_page == max_page: break
+				if numPage>0 and page_index == startPage+numPage:
+					break
 
 				# 超出总页数也得停止
-				if not self.more_page: break
+				if not has_more_page:
+					break
 
 				# 请求数据
 				try:
-					self.fetch_list()
+					qlist, has_more_page = self.fetch_list(username, page_index, increment)
 				except Exception as msg:
 					self.__log("ERROR: {0}".format(msg))
-
-				# 如果请求后还没有数据，那就算失败一次
-				if not len(self.qlist):
-					fail += 1
+				finally:
+					page_index += 1
 		
-		# 查缺补漏
-		if len(self.failed_qlist):
+		# 缺失的记录
+		if failed_qlist:
 			self.__log()
-			self.__log("读取完毕，开始查缺补漏：")
-
-		fail = 0
-		while len(self.failed_qlist):
-			if fail == maxFail: break
-			item = self.failed_qlist.pop()
-			try:
-				self.fetch_content(item)
-			except Exception as msg:
-				self.__log("ERROR: {0}".format(msg))
-				self.failed_qlist.append(item)
-				fail += 1
-				continue
+			self.__log("读取完毕，获取失败的问题编号：")
+		for qid,title,ctime in failed_qlist:
+			self.__log(qid)		
 		
 		# 结束
 		self.__log()
-		res = "当前第{0}页，共搜集记录数：{1}".format(self.this_page - 1, self.total)
+		res = "读取范围{0}-{1}页：成功（{2}），失败（{3}）".format(
+			startPage, page_index-1, item_count, len(failed_qlist))
 		self.__log(res)
 		self.__log("记录完毕")
 		self.__log()
 		self.log.close()
 		return
 
-	def fetch_list(self):
+	def fetch_list(self, username, page_index, page_increment):
 		'''获取当前页问题列表'''
 
 		self.__log()
-		self.__log("读取第%d页数据..." % self.this_page)
+		self.__log("读取第%d页数据..." % page_index)
 
 		# 提交参数
 		param = {
-			'un': self.username,
-			'pn': (self.this_page-1) * self.page_increment,
-			'rn': self.page_increment
+			'un': username,
+			'pn': (page_index-1) * page_increment,
+			'rn': page_increment
 		}
 
 		# 从api接口获取json数据
 		try:
 			response = requests.get(self.url_list, params=param).json()
 		except Exception:
-			raise Exception("读取第{0}页失败".format(self.this_page))
+			raise Exception("读取第{0}页失败".format(page_index))
 
 		# 记录总数及当前页数据
 		data =  response['data']['list']['entry']
-		self.more_page = response['data']['list']['hasMore']
+		has_more = response['data']['list']['hasMore']
 
-		for item in data:
-			li = (item['qid'], html.unescape(item['title']), item['reply_create_time'])
-			self.qlist.append(li)
+		res = [(
+			item['qid'], 
+			html.unescape(item['title']), 
+			item['reply_create_time']) for item in data]
 
 		# 检测解析数据是否成功
-		assert len(self.qlist), "解析第%d页失败" % self.this_page
+		assert len(res), "解析第%d页失败" % page_index
 
-		self.this_page += 1
-		return
+		return res, has_more
 
-	def fetch_content(self, item):
+	def fetch_content(self, item, username, post_path, img_path):
 		'''获取问题内容'''
 
 		self.__log("当前问题编号：%s" % item[0])
@@ -159,13 +153,13 @@ class IKNOWTOMARKDOWN:
 		soup = BeautifulSoup(response.text, "html.parser")
 
 		# 问题内容
-		q_content, q_img_content = self.__fetch_question(soup, item[0])
+		q_content, q_img_content = self.__parse_question(soup, item[0], img_path)
 
 		# 回答内容
-		a_content, a_img_content = self.__fetch_answer(soup, item[0])		
+		a_content, a_img_content = self.__parse_answer(soup, item[0], username, img_path)		
 
 		# 3 保存数据
-		filename = '_posts/{0}-{1}.md'.format(item[2], item[0])
+		filename = os.path.join(post_path, '{0}-{1}.md'.format(item[2], item[0]))
 		with open(filename, 'w', encoding='utf-8') as f:
 			# title
 			title = '''---
@@ -174,7 +168,7 @@ class IKNOWTOMARKDOWN:
 			title : {1}
 			tags  : UNTAGGED
 			---\n\n
-			'''.format(self.username, item[1]).replace("\t","")
+			'''.format(username, item[1]).replace("\t","")
 			f.write(title)
 
 			# question
@@ -187,8 +181,6 @@ class IKNOWTOMARKDOWN:
 			# answer
 			f.write(a_content)
 			f.writelines(a_img_content)
-
-		self.total += 1
 
 		return
 
@@ -227,7 +219,7 @@ class IKNOWTOMARKDOWN:
 		else:
 			return False
 
-	def __fetch_question(self, dom, qid):
+	def __parse_question(self, dom, qid, img_path):
 		'''获取提问内容'''
 
 		# 检测能否访问此问题
@@ -242,7 +234,7 @@ class IKNOWTOMARKDOWN:
 		q_imgs = []
 		for i, obj_img in enumerate(obj.find_all(class_='wgt-question-image-item'), start=1):
 			img_name = 'q-{0}.jpg'.format(qid) if i==1 else 'q-{0}-{1}.jpg'.format(qid, i)
-			if self.__save_file('_images/' + img_name, obj_img['data-src']):
+			if self.__save_file(os.path.join(img_path, img_name), obj_img['data-src']):
 				q_imgs.append(img_name)
 			else:
 				raise Exception("下载第{0}幅提问图片失败".format(i))		
@@ -250,16 +242,16 @@ class IKNOWTOMARKDOWN:
 
 		return q_content, q_img_content
 
-	def __fetch_answer(self, dom, qid):
+	def __parse_answer(self, dom, qid, author_id, img_path):
 		'''获取回答内容：提取回答的rid后用api获取json数据'''
 
 		# 定位回答者
-		author = dom.find("a", text=re.compile("%s" % self.username))
+		author = dom.find("a", text=re.compile("%s" % author_id))
 		if not author: # 回答被折叠
 			script_reply = dom.find('script', id='reply-wgt-tmpl')
 			if script_reply:
 				hidden_dom = BeautifulSoup(script_reply.text, "html.parser")
-				author = hidden_dom.find("a", text=re.compile("%s" % self.username))
+				author = hidden_dom.find("a", text=re.compile("%s" % author_id))
 
 		assert author, "暂未发现回答者"
 
@@ -294,22 +286,23 @@ class IKNOWTOMARKDOWN:
 		a_imgs = []
 		for i, url in enumerate(img_urls, start=1):
 			img_name = 'a-{0}.jpg'.format(qid) if i==1 else 'a-{0}-{1}.jpg'.format(qid, i)
-			if self.__save_file('_images/' + img_name, url):
+			if self.__save_file(os.path.join(img_path, img_name), url):
 				a_imgs.append(img_name)
 			else:
 				raise Exception("下载第{0}幅回答图片失败".format(i))
 
 		a_img_content = [self.img_url_pattern.format(img) for img in a_imgs]
 
-		return a_content, a_img_content		
+		return a_content, a_img_content
+
 
 if __name__ == '__main__':
 
-	username = 'learneroner'
+	username = 'xxx'
 
 	I = IKNOWTOMARKDOWN()
 
-	I.run(username,241,10)
+	I.run(username,361,10)
 
 
 	
