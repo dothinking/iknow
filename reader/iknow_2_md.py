@@ -29,10 +29,6 @@ class IKNOWTOMARKDOWN:
 			'Referer': 'https://zhidao.baidu.com/'
 		}
 
-		# 日志
-		self.log = open('log.log', 'w', encoding='utf-8')
-		self.__log("开启记录")
-
 		# 本地存储图片的全路径
 		self.img_url_pattern = '<div align=\'center\'><img src="{{{{ \'{0}\' | prepend: site.uploads | prepend: site.baseurl }}}}"></div>\n\n' # 注意{{被转义为{
 
@@ -61,6 +57,7 @@ class IKNOWTOMARKDOWN:
 			os.makedirs(img_path)
 
 		# 读取数据
+		self.log = open('{0}.log'.format(username), 'w', encoding='utf-8')
 		while True:	
 			# 列表有数据则处理，没数据则获取之
 			if qlist:
@@ -81,6 +78,7 @@ class IKNOWTOMARKDOWN:
 
 				# 超出总页数也得停止
 				if not has_more_page:
+					self.__log("")
 					break
 
 				# 请求数据
@@ -90,6 +88,9 @@ class IKNOWTOMARKDOWN:
 					self.__log("ERROR: {0}".format(msg))
 				finally:
 					page_index += 1
+					if not qlist:
+						self.__log("ERROR: 当前页已无数据")
+						has_more_page = False
 		
 		# 缺失的记录
 		if failed_qlist:
@@ -134,10 +135,7 @@ class IKNOWTOMARKDOWN:
 		res = [(
 			item['qid'], 
 			html.unescape(item['title']), 
-			item['reply_create_time']) for item in data]
-
-		# 检测解析数据是否成功
-		assert len(res), "解析第%d页失败" % page_index
+			item['reply_create_time']) for item in data]		
 
 		return res, has_more
 
@@ -295,14 +293,14 @@ class IKNOWTOMARKDOWN:
 
 		return a_content, a_img_content
 
-
+		
 if __name__ == '__main__':
 
 	username = 'xxx'
 
 	I = IKNOWTOMARKDOWN()
 
-	I.run(username,361,10)
+	I.run(username,1,10)
 
 
 	
