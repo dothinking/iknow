@@ -29,11 +29,12 @@ class IKNOWTOMARKDOWN:
 			'Referer': 'https://zhidao.baidu.com/'
 		}
 
-		# 本地存储图片的全路径
-		self.img_url_pattern = '<div align=\'center\'><img src="{{{{ \'{0}\' | prepend: site.uploads | prepend: site.baseurl }}}}"></div>\n\n' # 注意{{被转义为{
+		# 图片路径：本地存储/在线路径
+		self.img_pattern_local = '<div align=\'center\'><img src="{{{{ \'{0}\' | prepend: site.uploads | prepend: site.baseurl }}}}"></div>\n\n' # 注意{{被转义为{
+		self.img_pattern_online = '<div align=\'center\'><img src="{0}"></div>\n\n'
 
 
-	def run(self, username, startPage=1, numPage=-1, increment=20, path=None):
+	def run(self, username, startPage=1, numPage=-1, increment=20, path=None, downloadImg=True):
 		'''
 		   numPage: 读取页面数，默认-1表示所有页面
 		   increment: 每页问题数
@@ -49,12 +50,16 @@ class IKNOWTOMARKDOWN:
 		# 创建图片下载及问题保存目录
 		if not path:
 			path = os.getcwd()
-		post_path = os.path.join(path, username, 'posts')
-		img_path = os.path.join(path, username, 'images')
+		post_path = os.path.join(path, username, 'posts')		
 		if not os.path.exists(post_path):
 			os.makedirs(post_path)
-		if not os.path.exists(img_path):
-			os.makedirs(img_path)
+
+		if downloadImg:
+			img_path = os.path.join(path, username, 'images')
+			if not os.path.exists(img_path):
+				os.makedirs(img_path)
+		else:
+			img_path = None
 
 		# 读取数据
 		self.log = open('{0}.log'.format(username), 'w', encoding='utf-8')
@@ -231,12 +236,19 @@ class IKNOWTOMARKDOWN:
 		# 提问图片
 		q_imgs = []
 		for i, obj_img in enumerate(obj.find_all(class_='wgt-question-image-item'), start=1):
-			img_name = 'q-{0}.jpg'.format(qid) if i==1 else 'q-{0}-{1}.jpg'.format(qid, i)
-			if self.__save_file(os.path.join(img_path, img_name), obj_img['data-src']):
-				q_imgs.append(img_name)
+			if img_path: # 下载图片到本地目录
+				img_name = 'q-{0}.jpg'.format(qid) if i==1 else 'q-{0}-{1}.jpg'.format(qid, i)
+				if self.__save_file(os.path.join(img_path, img_name), obj_img['data-src']):
+					q_imgs.append(img_name)
+				else:
+					raise Exception("下载第{0}幅提问图片失败".format(i))
 			else:
-				raise Exception("下载第{0}幅提问图片失败".format(i))		
-		q_img_content = [self.img_url_pattern.format(img) for img in q_imgs]
+				q_imgs.append(obj_img['data-src'])
+
+		if img_path:
+			q_img_content = [self.img_pattern_local.format(img) for img in q_imgs]
+		else:
+			q_img_content = [self.img_pattern_online.format(img) for img in q_imgs]			
 
 		return q_content, q_img_content
 
@@ -281,15 +293,17 @@ class IKNOWTOMARKDOWN:
 
 		# 图片
 		img_urls = [url[0] for url in response['data']['imgUrl']] if response['data']['imgUrl'] else []
-		a_imgs = []
-		for i, url in enumerate(img_urls, start=1):
-			img_name = 'a-{0}.jpg'.format(qid) if i==1 else 'a-{0}-{1}.jpg'.format(qid, i)
-			if self.__save_file(os.path.join(img_path, img_name), url):
-				a_imgs.append(img_name)
-			else:
-				raise Exception("下载第{0}幅回答图片失败".format(i))
-
-		a_img_content = [self.img_url_pattern.format(img) for img in a_imgs]
+		if img_path:
+			a_imgs = []
+			for i, url in enumerate(img_urls, start=1):
+				img_name = 'a-{0}.jpg'.format(qid) if i==1 else 'a-{0}-{1}.jpg'.format(qid, i)
+				if self.__save_file(os.path.join(img_path, img_name), url):
+					a_imgs.append(img_name)
+				else:
+					raise Exception("下载第{0}幅回答图片失败".format(i))
+			a_img_content = [self.img_pattern_local.format(img) for img in a_imgs]
+		else:
+			a_img_content = [self.img_pattern_online.format(img) for img in img_urls]
 
 		return a_content, a_img_content
 
@@ -300,7 +314,7 @@ if __name__ == '__main__':
 
 	I = IKNOWTOMARKDOWN()
 
-	I.run(username,1,10)
+	I.run(username)
 
 
 	
